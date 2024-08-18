@@ -8,15 +8,16 @@ using OpenQA.Selenium.Appium.iOS;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Safari;
 using System.Diagnostics;
 
 namespace TrashTaf.XUnit
 {
-    public class Adapter
+    public class TrashTafTestAdapter
     {
         public TrashContext TrashContext;
-        public Adapter()
+        public TrashTafTestAdapter()
         {
             TrashContext = new();
             using Stream stream = File.OpenRead("appSettings.json");
@@ -56,15 +57,58 @@ namespace TrashTaf.XUnit
             ctx.TestCaseId = (int)stackTrace.GetFrame(2).GetMethod().CustomAttributes.First(a => a.AttributeType == typeof(TestCase)).ConstructorArguments[0].Value;
             Console.WriteLine($"Begining pre-execution for test case #{ctx.TestCaseId} {ctx.ClassName}.{ctx.TestName}");
             Console.WriteLine("Starting WebDriver");
-            WebDriver webDriver = ctx.BrowserName switch
+            WebDriver webDriver;
+            switch(ctx.BrowserName)
             {
-                "chrome" => new ChromeDriver(),
-                "firefox" => new FirefoxDriver(),
-                "edge" => new EdgeDriver(),
-                "safari" => new SafariDriver(),
-                "android" => new AndroidDriver(new AppiumOptions()),
-                "ios" => new IOSDriver(new AppiumOptions()),
-                _ => throw new Exception($"Unknown browser {ctx.BrowserName} please use chrome, firefox, edge, safari, android, or ios"),
+                case "chrome":
+                    var chromeOptions = new ChromeOptions();
+                    if (ctx.IsHeadless)
+                    {
+                        chromeOptions.AddArgument("--headless=new");
+                    }
+                    webDriver = new ChromeDriver(chromeOptions);
+                    break;
+                case "firefox":
+                    var firefoxOptions = new FirefoxOptions();
+                    if(ctx.IsHeadless)
+                    {
+                        firefoxOptions.AddArguments("--headless");
+                    }
+                    webDriver = new FirefoxDriver();
+                    break;
+                case "edge":
+                    var edgeOptions = new EdgeOptions();
+                    if (ctx.IsHeadless)
+                    {
+                        edgeOptions.AddArgument("--headless=new");
+                    }
+                    webDriver = new EdgeDriver(edgeOptions);
+                    break;
+                case "safari":
+                    if(ctx.IsHeadless)
+                    {
+                        throw new Exception("Safari doesn't support headless mode");
+                    }
+                    webDriver = new SafariDriver();
+                    break;
+                case "android":
+                    var androidOptions = new AppiumOptions();
+                    if (ctx.IsHeadless)
+                    {
+                        androidOptions.AddAdditionalAppiumOption("isHeadless", true);
+                    }
+                    webDriver = new AndroidDriver(androidOptions);
+                    break;
+                case "ios":
+                    var iosOptions = new AppiumOptions();
+                    if (ctx.IsHeadless)
+                    {
+                        iosOptions.AddAdditionalAppiumOption("isHeadless", true);
+                    }
+                    webDriver = new IOSDriver(iosOptions);
+                    break;
+                default:
+                    throw new Exception($"Unknown browser {ctx.BrowserName} please use chrome, firefox, edge, safari, android, or ios"),
             };
             Console.WriteLine("WebDriver started");
             (webDriver as IJavaScriptExecutor).ExecuteScript("console.log('WebDriver started');");
@@ -87,6 +131,6 @@ namespace TrashTaf.XUnit
             }
         }
 
-        public static void Execute(Action<TrashContext, WebDriver> test) => new Adapter().ExecuteTest(test);
+        public static void Execute(Action<TrashContext, WebDriver> test) => new TrashTafTestAdapter().ExecuteTest(test);
     }
 }

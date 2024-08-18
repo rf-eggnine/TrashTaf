@@ -13,5 +13,6 @@ namespace TrashTaf.XUnit
         public string OperatingSystemName;
         public string OperatingSystemMajorVersion;
         public Exception Exception;
+        public bool IsHeadless;
     }
 }
