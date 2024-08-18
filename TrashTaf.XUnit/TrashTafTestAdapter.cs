@@ -8,7 +8,6 @@ using OpenQA.Selenium.Appium.iOS;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
-using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Safari;
 using System.Diagnostics;
 
@@ -40,6 +39,9 @@ namespace TrashTaf.XUnit
                             break;
                         case "operatingSystemVMajorVersion":
                             TrashContext.OperatingSystemMajorVersion = property.Value.ToString();
+                            break;
+                        case "isHeadless":
+                            bool.TryParse(property.Value.ToString(), out TrashContext.IsHeadless);
                             break;
                         default:
                             break;
