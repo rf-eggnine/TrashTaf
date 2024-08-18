@@ -48,6 +48,8 @@ namespace TrashTaf.XUnit
                     }
                 }
             }
+            Console.WriteLine($"Browser: {TrashContext.BrowserName} {TrashContext.BrowserMajorVersion}");
+            Console.WriteLine($"Operating System: {TrashContext.OperatingSystemName} {TrashContext.OperatingSystemMajorVersion}");
         }
 
         public void ExecuteTest(Action<TrashContext, WebDriver> test)
