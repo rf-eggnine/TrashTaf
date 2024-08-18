@@ -6,7 +6,7 @@ namespace TrashTaf.XUnit
     public class ExampleTests
     {
         [Fact, TestCase(1)]
-        public void VerifyTestCaseOneIsFound() => Adapter.Execute((ctx, webDriver) =>
+        public void VerifyTestCaseOneIsFound() => TrashTafTestAdapter.Execute((ctx, webDriver) =>
         {
             // Arrange
             webDriver.Navigate().GoToUrl("https://github.com/rf-eggnine/TrashTaf/Issues");
