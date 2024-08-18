@@ -62,7 +62,7 @@ namespace TrashTaf.XUnit
             Console.WriteLine($"Begining pre-execution for test case #{ctx.TestCaseId} {ctx.ClassName}.{ctx.TestName}");
             Console.WriteLine("Starting WebDriver");
             WebDriver webDriver;
-            switch(ctx.BrowserName)
+            switch (ctx.BrowserName)
             {
                 case "chrome":
                     var chromeOptions = new ChromeOptions();
@@ -74,7 +74,7 @@ namespace TrashTaf.XUnit
                     break;
                 case "firefox":
                     var firefoxOptions = new FirefoxOptions();
-                    if(ctx.IsHeadless)
+                    if (ctx.IsHeadless)
                     {
                         firefoxOptions.AddArguments("--headless");
                     }
@@ -89,7 +89,7 @@ namespace TrashTaf.XUnit
                     webDriver = new EdgeDriver(edgeOptions);
                     break;
                 case "safari":
-                    if(ctx.IsHeadless)
+                    if (ctx.IsHeadless)
                     {
                         throw new Exception("Safari doesn't support headless mode");
                     }
@@ -112,7 +112,7 @@ namespace TrashTaf.XUnit
                     webDriver = new IOSDriver(iosOptions);
                     break;
                 default:
-                    throw new Exception($"Unknown browser {ctx.BrowserName} please use chrome, firefox, edge, safari, android, or ios"),
+                    throw new Exception($"Unknown browser {ctx.BrowserName} please use chrome, firefox, edge, safari, android, or ios");
             };
             Console.WriteLine("WebDriver started");
             (webDriver as IJavaScriptExecutor).ExecuteScript("console.log('WebDriver started');");
