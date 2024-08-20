@@ -37,11 +37,17 @@ namespace TrashTaf.XUnit
                         case "operatingSystemName":
                             TrashContext.OperatingSystemName = property.Value.ToString();
                             break;
-                        case "operatingSystemVMajorVersion":
+                        case "operatingSystemMajorVersion":
                             TrashContext.OperatingSystemMajorVersion = property.Value.ToString();
                             break;
                         case "isHeadless":
                             bool.TryParse(property.Value.ToString(), out TrashContext.IsHeadless);
+                            break;
+                        case "username":
+                            TrashContext.Username = property.Value.ToString();
+                            break;
+                        case "password":
+                            TrashContext.Password = property.Value.ToString();
                             break;
                         default:
                             break;
