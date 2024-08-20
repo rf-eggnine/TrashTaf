@@ -25,6 +25,6 @@ jobs:
       with:
         path: TrashTaf.XUnit/bin/debug/net8.0/
         file: appSettings.json
-        content: "{ 'browserName': 'chrome', 'browserMajorVersion': 'latest', 'operatingSystemName': 'ubuntu', 'operatingSystemMajorVersion': '22.04' }" 
+        content: "{ 'browserName': 'chrome', 'browserMajorVersion': 'latest', 'operatingSystemName': 'ubuntu', 'operatingSystemMajorVersion': '22.04', 'username': '$Username', 'password': '$Password' }" 
     - name: Test
       run: dotnet test --no-build --verbosity normal
