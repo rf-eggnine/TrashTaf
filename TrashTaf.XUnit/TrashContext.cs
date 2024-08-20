@@ -12,6 +12,8 @@ namespace TrashTaf.XUnit
         public string BrowserMajorVersion;
         public string OperatingSystemName;
         public string OperatingSystemMajorVersion;
+        public string Username;
+        public string Password;
         public Exception Exception;
         public bool IsHeadless;
     }
