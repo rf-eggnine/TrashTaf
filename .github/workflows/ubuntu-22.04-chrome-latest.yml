@@ -26,6 +26,6 @@ jobs:
         path: /home/runner/work/TrashTaf/TrashTaf/TrashTaf.XUnit/bin/Debug/net8.0/
         isAbsolutePath: true 
         file: appSettings.json
-        content: "{ 'browserName': 'chrome', 'browserMajorVersion': 'latest', 'operatingSystemName': 'ubuntu', 'operatingSystemMajorVersion': '22.04', 'username': '$Username', 'password': '$Password' }" 
+        content: "{ 'browserName': 'chrome', 'browserMajorVersion': 'latest', 'operatingSystemName': 'ubuntu', 'operatingSystemMajorVersion': '22.04', 'isHeadless': true, 'username': '$Username', 'password': '$Password' }" 
     - name: Test
       run: dotnet test --no-build --verbosity normal
