@@ -396,5 +396,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-/TrashTaf.XUnit/appSettings.json
 /Eggnine.TrashTaf.XUnit/appSettings.json
