@@ -11,7 +11,7 @@
 
         public override bool Matches(TrashContext ctx)
         {
-            return string.Equals(Browser, ctx.BrowserName);
+            return !string.Equals(Browser, ctx.BrowserName);
         }
 
         public override string Reason(TrashContext ctx)
