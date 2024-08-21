@@ -37,11 +37,10 @@ namespace Eggnine.TrashTaf.XUnit
                         case "browserMajorVersion":
                             TrashContext.BrowserMajorVersion = property.Value.ToString();
                             break;
-                        case "operatingSystemName":
-                            TrashContext.OperatingSystemName = property.Value.ToString();
-                            break;
-                        case "operatingSystemMajorVersion":
-                            TrashContext.OperatingSystemMajorVersion = property.Value.ToString();
+                        case "operatingSystemNameAndMajorVersion":
+                            var splitOsAndVersion = property.Value.ToString().Split("-");
+                            TrashContext.OperatingSystemName = splitOsAndVersion[0];
+                            TrashContext.OperatingSystemMajorVersion = splitOsAndVersion[1];
                             break;
                         case "isHeadless":
                             bool.TryParse(property.Value.ToString(), out TrashContext.IsHeadless);
@@ -98,14 +97,6 @@ namespace Eggnine.TrashTaf.XUnit
                     var firefoxOptions = new FirefoxOptions();
                     if (ctx.IsHeadless)
                     {
-                        firefoxOptions.AddAdditionalFirefoxOption("headless", true);
-                        firefoxOptions.AddAdditionalFirefoxOption("-headless", true);
-                        firefoxOptions.AddAdditionalFirefoxOption("--headless", true);
-                        firefoxOptions.AddAdditionalOption("headless", true);
-                        firefoxOptions.AddAdditionalOption("-headless", true);
-                        firefoxOptions.AddAdditionalOption("--headless", true);
-                        firefoxOptions.AddArgument("headless");
-                        firefoxOptions.AddArgument("-headless");
                         firefoxOptions.AddArgument("--headless");
                     }
                     webDriver = new FirefoxDriver();

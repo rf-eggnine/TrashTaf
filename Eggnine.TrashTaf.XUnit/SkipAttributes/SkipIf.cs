@@ -24,7 +24,7 @@ namespace Eggnine.TrashTaf.XUnit.SkipAttributes
             if(Matches(ctx))
             {
                 string reason = Reason(ctx);
-                Console.WriteLine($"skipping test because {reason}");
+                Console.WriteLine($"skipping test {ctx.ClassName}.{ctx.TestName} because {reason}");
                 throw new SkipException(reason);
             }
         }

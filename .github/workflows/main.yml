@@ -1,0 +1,42 @@
+name: Eggnine.TrashTaf_main 
+
+on: 
+  push: 
+    branches: [ "main" ] 
+  pull_request: 
+    branches: [ "main" ] 
+
+
+jobs: 
+  tests: 
+    strategy: 
+      fail-fast: false 
+      matrix: 
+        opertatingSystem: [ ubuntu-22.04, windows-2019, windows-2022, macos-13 ] 
+        browser: ["chrome", 'firefox', 'edge'] 
+
+    runs-on: ${{ matrix.operatingSystem }} 
+
+    steps: 
+    - uses: actions/checkout@v4 
+    - name: Setup .NET 
+      uses: actions/setup-dotnet@v4 
+      with: 
+        dotnet-version: 8.0.x 
+    - name: Restore dependencies 
+      run: dotnet restore 
+    - name: Build 
+      run: dotnet build --no-restore 
+    - name: Start Xvfb 
+      if: matrix.os == 'ubuntu' && matrix.browser == 'firefox' 
+      run: Xvfb :99 & 
+    - name: Export display 
+      if: matrix.os == 'ubuntu' && matrix.browser == 'firefox' 
+      run: export DISPLAY=:99 
+    - uses: 1arp/create-a-file-action@0.4.5 
+      with: 
+        path: TrashTaf/TrashTaf/Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/ 
+        file: appSettings.json 
+        content: "{ 'browserName': '${{ matrix.browser }}', 'browserMajorVersion': 'latest', 'operatingSystemNameAndMajorVersion': '${{ matrix.operatingSystem }}', 'isHeadless': true, 'username': '$Username', 'password': '$Password' }" 
+    - name: Test ${{ matrix.browser }} on ${{ matrix.operatingSystem }} 
+      run: dotnet test --no-build --verbosity normal 
