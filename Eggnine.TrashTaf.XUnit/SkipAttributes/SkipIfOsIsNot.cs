@@ -17,7 +17,7 @@
 
         public override string Reason(TrashContext ctx)
         {
-            return $"Skipping because OperatingSystemName is {ctx.OperatingSystemName} and not {OperatingSystem}";
+            return $"OperatingSystemName is {ctx.OperatingSystemName} and not {OperatingSystem}";
         }
     }
 }
