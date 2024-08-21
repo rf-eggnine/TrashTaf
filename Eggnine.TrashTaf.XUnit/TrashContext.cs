@@ -1,6 +1,6 @@
 ﻿// TrashTaf © 2024 by RF@EggNine.com All Rights Reserved
 
-namespace TrashTaf.XUnit
+namespace Eggnine.TrashTaf.XUnit
 {
     public class TrashContext
     {
@@ -16,5 +16,7 @@ namespace TrashTaf.XUnit
         public string Password;
         public Exception Exception;
         public bool IsHeadless;
+
+        public int Priority { get; internal set; }
     }
 }

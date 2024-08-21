@@ -2,12 +2,12 @@
 using OpenQA.Selenium;
 using System.Diagnostics;
 
-namespace TrashTaf.XUnit
+namespace Eggnine.TrashTaf.XUnit.Tests
 {
     public class ExampleTests
     {
-        [Fact, TestCase(1)]
-        public void VerifyTestCaseOneIsFound() => TrashTafTestAdapter.Execute((ctx, webDriver) =>
+        [SkippableFact, TestCase(1), Priority(1)]
+        public void VerifyTestCaseOneIsFoundViaWebDriver() => TrashTafTestAdapter.Execute((ctx, webDriver) =>
         {
             // Arrange
             webDriver.Navigate().GoToUrl("https://github.com/login");
@@ -19,7 +19,7 @@ namespace TrashTaf.XUnit
             IWebElement signInButton = webDriver.FindElement(By.XPath("//input[@value='Sign in']"));
             signInButton.Click();
             Task.Delay(1000).Wait();
-            Debug.WriteLine((webDriver as IJavaScriptExecutor).ExecuteScript("return document.body.getInnerHTML()"));
+            Debug.WriteLine((webDriver as IJavaScriptExecutor).ExecuteScript("return document.body.innerHTML"));
             webDriver.Navigate().GoToUrl("https://github.com/rf-eggnine/TrashTaf/issues/1");
             // Act
             var element = webDriver.FindElement(By.CssSelector("#partial-discussion-header .js-issue-title.markdown-title"));

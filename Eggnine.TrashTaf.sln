@@ -3,13 +3,22 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrashTaf.XUnit", "TrashTaf.XUnit\TrashTaf.XUnit.csproj", "{4DC1AB05-681B-4897-BC58-882778A7A12B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eggnine.TrashTaf.XUnit", "Eggnine.TrashTaf.XUnit\Eggnine.TrashTaf.XUnit.csproj", "{4DC1AB05-681B-4897-BC58-882778A7A12B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9986247E-FF15-4970-B4C1-BE4DCDB85AAA}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		LICENSE.TXT = LICENSE.TXT
 		README.MD = README.MD
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{1FD03BA6-C787-4FF9-9CDD-0A177D20966F}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\branch.yml = .github\workflows\branch.yml
+		.github\workflows\main.yml = .github\workflows\main.yml
+		.github\workflows\monthly-chrome-firefox.yml = .github\workflows\monthly-chrome-firefox.yml
+		.github\workflows\montly-edge.yml = .github\workflows\montly-edge.yml
+		.github\workflows\montly-safari.yml = .github\workflows\montly-safari.yml
 	EndProjectSection
 EndProject
 Global

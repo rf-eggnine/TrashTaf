@@ -1,4 +1,5 @@
 ﻿// TrashTaf © 2024 by RF@EggNine.com All Rights Reserved
+using Eggnine.TrashTaf.XUnit.SkipAttributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
@@ -9,9 +10,12 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Safari;
+using System;
 using System.Diagnostics;
+using System.Reflection;
+using Xunit;
 
-namespace TrashTaf.XUnit
+namespace Eggnine.TrashTaf.XUnit
 {
     public class TrashTafTestAdapter
     {
@@ -22,11 +26,11 @@ namespace TrashTaf.XUnit
             using Stream stream = File.OpenRead("appSettings.json");
             using StreamReader reader = new StreamReader(stream);
             JToken token = JsonConvert.DeserializeObject<JToken>(reader.ReadToEnd());
-            foreach(JToken child in token.Children())
+            foreach (JToken child in token.Children())
             {
-                if(child is JProperty property)
+                if (child is JProperty property)
                 {
-                    switch(property.Name)
+                    switch (property.Name)
                     {
                         case "browserName":
                             TrashContext.BrowserName = property.Value.ToString();
@@ -34,11 +38,10 @@ namespace TrashTaf.XUnit
                         case "browserMajorVersion":
                             TrashContext.BrowserMajorVersion = property.Value.ToString();
                             break;
-                        case "operatingSystemName":
-                            TrashContext.OperatingSystemName = property.Value.ToString();
-                            break;
-                        case "operatingSystemMajorVersion":
-                            TrashContext.OperatingSystemMajorVersion = property.Value.ToString();
+                        case "operatingSystemNameAndMajorVersion":
+                            var splitOsAndVersion = property.Value.ToString().Split("-");
+                            TrashContext.OperatingSystemName = splitOsAndVersion[0];
+                            TrashContext.OperatingSystemMajorVersion = splitOsAndVersion[1];
                             break;
                         case "isHeadless":
                             bool.TryParse(property.Value.ToString(), out TrashContext.IsHeadless);
@@ -58,16 +61,30 @@ namespace TrashTaf.XUnit
             Console.WriteLine($"Operating System: {TrashContext.OperatingSystemName} {TrashContext.OperatingSystemMajorVersion}");
         }
 
+        /// <summary>
+        /// Provides integration points for supported features before and after the test
+        /// </summary>
+        /// <param name="test"></param>
+        /// <exception cref="Exception"></exception>
         public void ExecuteTest(Action<TrashContext, WebDriver> test)
         {
             var ctx = TrashContext;
             var stackTrace = new StackTrace();
-            ctx.TestName = stackTrace.GetFrame(2).GetMethod().Name;
-            ctx.ClassName = stackTrace.GetFrame(2).GetMethod().ReflectedType.Name;
-            ctx.TestCaseId = (int)stackTrace.GetFrame(2).GetMethod().CustomAttributes.First(a => a.AttributeType == typeof(TestCase)).ConstructorArguments[0].Value;
+            var testMethod = stackTrace.GetFrame(2).GetMethod();
+            ctx.TestName = testMethod.Name;
+            ctx.ClassName = testMethod.ReflectedType.Name;
+            ctx.TestCaseId = (int)testMethod.CustomAttributes.First(a => a.AttributeType == typeof(TestCase)).ConstructorArguments[0].Value;
+            ctx.Priority = (int)testMethod.CustomAttributes.First(a => a.AttributeType == typeof(Priority)).ConstructorArguments[0].Value;
             Console.WriteLine($"Begining pre-execution for test case #{ctx.TestCaseId} {ctx.ClassName}.{ctx.TestName}");
+            IEnumerable<SkipIf> skipIfs = testMethod.GetCustomAttributes().Where(a => a is SkipIf).Cast<SkipIf>();
+            Console.WriteLine($"Checking if test case should be skipped");
+            foreach(SkipIf skipIf in skipIfs)
+            {
+                skipIf.True(ctx);
+            }
             Console.WriteLine("Starting WebDriver");
             WebDriver webDriver;
+            Func<WebDriver> webDriverFunc;
             switch (ctx.BrowserName)
             {
                 case "chrome":
@@ -76,30 +93,38 @@ namespace TrashTaf.XUnit
                     {
                         chromeOptions.AddArgument("--headless=new");
                     }
-                    webDriver = new ChromeDriver(chromeOptions);
+                    webDriverFunc = () => new ChromeDriver(chromeOptions);
                     break;
                 case "firefox":
                     var firefoxOptions = new FirefoxOptions();
                     if (ctx.IsHeadless)
                     {
-                        firefoxOptions.AddArguments("--headless");
+                        firefoxOptions.AddArgument("--headless");
                     }
-                    webDriver = new FirefoxDriver();
+                    webDriverFunc = () => new FirefoxDriver();
                     break;
                 case "edge":
+                    if(!ctx.OperatingSystemName.Equals("Windows", StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new Exception("Edge only runs on Windows");
+                    }
                     var edgeOptions = new EdgeOptions();
                     if (ctx.IsHeadless)
                     {
                         edgeOptions.AddArgument("--headless=new");
                     }
-                    webDriver = new EdgeDriver(edgeOptions);
+                    webDriverFunc = () => new EdgeDriver(edgeOptions);
                     break;
                 case "safari":
+                    if (!ctx.OperatingSystemName.Equals("MacOs", StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new Exception("Safari only runs on MacOs");
+                    }
                     if (ctx.IsHeadless)
                     {
                         throw new Exception("Safari doesn't support headless mode");
                     }
-                    webDriver = new SafariDriver();
+                    webDriverFunc = () => new SafariDriver();
                     break;
                 case "android":
                     var androidOptions = new AppiumOptions();
@@ -107,7 +132,7 @@ namespace TrashTaf.XUnit
                     {
                         androidOptions.AddAdditionalAppiumOption("isHeadless", true);
                     }
-                    webDriver = new AndroidDriver(androidOptions);
+                    webDriverFunc = () => new AndroidDriver(androidOptions);
                     break;
                 case "ios":
                     var iosOptions = new AppiumOptions();
@@ -115,11 +140,12 @@ namespace TrashTaf.XUnit
                     {
                         iosOptions.AddAdditionalAppiumOption("isHeadless", true);
                     }
-                    webDriver = new IOSDriver(iosOptions);
+                    webDriverFunc = () => new IOSDriver(iosOptions);
                     break;
                 default:
                     throw new Exception($"Unknown browser {ctx.BrowserName} please use chrome, firefox, edge, safari, android, or ios");
             };
+            webDriver = StartWebDriverWithRetries(webDriverFunc);
             Console.WriteLine("WebDriver started");
             (webDriver as IJavaScriptExecutor).ExecuteScript("console.log('WebDriver started');");
             try
@@ -132,15 +158,45 @@ namespace TrashTaf.XUnit
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Test failed: {ctx.ClassName}.{ctx.TestName} with exception {ex.GetType().FullName} because {ex.Message}");
                 ctx.Exception = ex;
                 throw;
             }
             finally
             {
+                Console.WriteLine("Tearing down WebDriver");
                 webDriver.Quit();
             }
         }
 
+        /// <summary>
+        /// Starts the WebDriver with retry-able exceptions
+        /// </summary>
+        /// <param name="webDriverFunc"></param>
+        /// <returns></returns>
+        private WebDriver StartWebDriverWithRetries(Func<WebDriver> webDriverFunc)
+        {
+            int i = 0;
+            while (true)
+            {
+                try
+                {
+                    return webDriverFunc();
+                }
+                catch (WebDriverException)
+                {
+                    Console.WriteLine($"WebDriver start failed on attempt {i}");
+                    if (i > 4)
+                        throw;
+                }
+                i++;
+            }
+        }
+
+        /// <summary>
+        /// Convenience method for Tests to call
+        /// </summary>
+        /// <param name="test"></param>
         public static void Execute(Action<TrashContext, WebDriver> test) => new TrashTafTestAdapter().ExecuteTest(test);
     }
 }
