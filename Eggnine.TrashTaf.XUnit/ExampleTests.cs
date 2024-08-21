@@ -28,7 +28,7 @@ namespace Eggnine.TrashTaf.XUnit
             Assert.Equal("Verify Test Case 1 is found", element.Text);
         });
 
-        [Fact, TestCase(14), Priority(2), SkipIfOsIsNot("windows")]
+        [SkippableFact, TestCase(14), Priority(2), SkipIfOsIsNot("windows")]
         public void VerifyTestRunsOnWindows() => TrashTafTestAdapter.Execute((ctx, webDriver) =>
         {
 
@@ -48,7 +48,6 @@ namespace Eggnine.TrashTaf.XUnit
             var element = webDriver.FindElement(By.CssSelector("#partial-discussion-header .js-issue-title.markdown-title"));
             // Assert
             Assert.Equal("Verify Test Case 1 is found", element.Text);
-        }
-        );
+        });
     }
 }

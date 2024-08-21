@@ -11,7 +11,7 @@ using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Safari;
 using System.Diagnostics;
-using Xunit;
+using System.Reflection;
 
 namespace Eggnine.TrashTaf.XUnit
 {
@@ -75,15 +75,11 @@ namespace Eggnine.TrashTaf.XUnit
             ctx.TestCaseId = (int)testMethod.CustomAttributes.First(a => a.AttributeType == typeof(TestCase)).ConstructorArguments[0].Value;
             ctx.Priority = (int)testMethod.CustomAttributes.First(a => a.AttributeType == typeof(Priority)).ConstructorArguments[0].Value;
             Console.WriteLine($"Begining pre-execution for test case #{ctx.TestCaseId} {ctx.ClassName}.{ctx.TestName}");
-            IEnumerable<SkipIf> skipIfs = testMethod.CustomAttributes.Where(a => a.AttributeType.IsAssignableFrom(typeof(SkipIf))).Cast<SkipIf>();
-            Console.WriteLine($"checking if test case should be skipped");
+            IEnumerable<SkipIf> skipIfs = testMethod.GetCustomAttributes().Where(a => a is SkipIf).Cast<SkipIf>();
+            Console.WriteLine($"Checking if test case should be skipped");
             foreach(SkipIf skipIf in skipIfs)
             {
-                if(skipIf.Matches(ctx))
-                {
-                    Console.WriteLine($"skipping test because {skipIf.Reason(ctx)}");
-                }
-                Skip.If(skipIf.Matches(ctx), skipIf.Reason(ctx));
+                skipIf.True(ctx);
             }
             Console.WriteLine("Starting WebDriver");
             WebDriver webDriver;
@@ -151,11 +147,13 @@ namespace Eggnine.TrashTaf.XUnit
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Test failed: {ctx.ClassName}.{ctx.TestName} with exception {ex.GetType().FullName} because {ex.Message}");
                 ctx.Exception = ex;
                 throw;
             }
             finally
             {
+                Console.WriteLine("Tearing down WebDriver");
                 webDriver.Quit();
             }
         }

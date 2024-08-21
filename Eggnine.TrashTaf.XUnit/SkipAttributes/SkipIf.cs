@@ -1,4 +1,5 @@
 ﻿using OpenQA.Selenium.Internal;
+using System.Drawing;
 
 namespace Eggnine.TrashTaf.XUnit.SkipAttributes
 {
@@ -17,5 +18,15 @@ namespace Eggnine.TrashTaf.XUnit.SkipAttributes
         /// <param name="ctx"></param>
         /// <returns></returns>
         public abstract string Reason(TrashContext ctx);
+
+        public void True(TrashContext ctx)
+        {
+            if(Matches(ctx))
+            {
+                string reason = Reason(ctx);
+                Console.WriteLine($"skipping test because {reason}");
+                throw new SkipException(reason);
+            }
+        }
     }
 }

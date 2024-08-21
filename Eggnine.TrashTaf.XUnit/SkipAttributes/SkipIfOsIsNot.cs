@@ -12,7 +12,7 @@
 
         public override bool Matches(TrashContext ctx)
         {
-            return string.Equals(OperatingSystem, ctx.OperatingSystemName, StringComparison.OrdinalIgnoreCase);
+            return !string.Equals(OperatingSystem, ctx.OperatingSystemName, StringComparison.OrdinalIgnoreCase);
         }
 
         public override string Reason(TrashContext ctx)
