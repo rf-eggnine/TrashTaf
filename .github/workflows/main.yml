@@ -18,8 +18,6 @@ jobs:
     runs-on: ${{ format('{0}', matrix.operatingSystem) }} 
 
     steps: 
-    - name: pwd 
-      run: pwd 
     - uses: actions/checkout@v4 
     - name: Setup .NET 
       uses: actions/setup-dotnet@v4 
@@ -37,7 +35,7 @@ jobs:
       run: export DISPLAY=:99 
     - uses: 1arp/create-a-file-action@0.4.5 
       with: 
-        path: ../TrashTaf/TrashTaf/Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/ 
+        path: Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/ 
         file: appSettings.json 
         content: "{ 'browserName': '${{ matrix.browser }}', 'browserMajorVersion': 'latest', 'operatingSystemNameAndMajorVersion': '${{ matrix.operatingSystem }}', 'isHeadless': true, 'username': '$Username', 'password': '$Password' }" 
     - name: Test ${{ matrix.browser }} on ${{ matrix.operatingSystem }} 
