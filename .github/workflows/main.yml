@@ -15,7 +15,7 @@ jobs:
         opertatingSystem: [ ubuntu-22.04, windows-2019, windows-2022, macos-13 ] 
         browser: ["chrome", 'firefox', 'edge'] 
 
-    runs-on: ${{ matrix.operatingSystem }} 
+    runs-on: ${{ format('{0}', matrix.operatingSystem }} 
 
     steps: 
     - uses: actions/checkout@v4 
