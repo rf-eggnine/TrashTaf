@@ -98,9 +98,15 @@ namespace Eggnine.TrashTaf.XUnit
                     var firefoxOptions = new FirefoxOptions();
                     if (ctx.IsHeadless)
                     {
+                        firefoxOptions.AddAdditionalFirefoxOption("headless", true);
+                        firefoxOptions.AddAdditionalFirefoxOption("-headless", true);
+                        firefoxOptions.AddAdditionalFirefoxOption("--headless", true);
                         firefoxOptions.AddAdditionalOption("headless", true);
                         firefoxOptions.AddAdditionalOption("-headless", true);
                         firefoxOptions.AddAdditionalOption("--headless", true);
+                        firefoxOptions.AddArgument("headless");
+                        firefoxOptions.AddArgument("-headless");
+                        firefoxOptions.AddArgument("--headless");
                     }
                     webDriver = new FirefoxDriver();
                     break;
