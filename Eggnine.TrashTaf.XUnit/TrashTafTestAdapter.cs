@@ -12,6 +12,7 @@ using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Safari;
 using System.Diagnostics;
 using System.Reflection;
+using Xunit;
 
 namespace Eggnine.TrashTaf.XUnit
 {
@@ -97,7 +98,7 @@ namespace Eggnine.TrashTaf.XUnit
                     var firefoxOptions = new FirefoxOptions();
                     if (ctx.IsHeadless)
                     {
-                        firefoxOptions.AddArguments("--headless");
+                        firefoxOptions.AddArgument("-headless");
                     }
                     webDriver = new FirefoxDriver();
                     break;

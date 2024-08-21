@@ -19,7 +19,7 @@ namespace Eggnine.TrashTaf.XUnit.Tests
             IWebElement signInButton = webDriver.FindElement(By.XPath("//input[@value='Sign in']"));
             signInButton.Click();
             Task.Delay(1000).Wait();
-            Debug.WriteLine((webDriver as IJavaScriptExecutor).ExecuteScript("return document.body.getInnerHTML()"));
+            Debug.WriteLine((webDriver as IJavaScriptExecutor).ExecuteScript("return document.body.innerHTML"));
             webDriver.Navigate().GoToUrl("https://github.com/rf-eggnine/TrashTaf/issues/1");
             // Act
             var element = webDriver.FindElement(By.CssSelector("#partial-discussion-header .js-issue-title.markdown-title"));
