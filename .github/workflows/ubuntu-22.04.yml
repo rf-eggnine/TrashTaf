@@ -31,6 +31,10 @@ jobs:
       run: dotnet test --no-build --verbosity normal
     - name: Start Xvfb
       run: Xvfb :99 &
+    - name: Export display
+      run: export DISPLAY=:0
+    - name: Run xhost +
+      run: xhost +
     - uses: 1arp/create-a-file-action@0.4.5
       with:
         path: /home/runner/work/TrashTaf/TrashTaf/Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/
