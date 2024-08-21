@@ -6,7 +6,7 @@ namespace Eggnine.TrashTaf.XUnit.Tests
 {
     public class ExampleTests
     {
-        [Fact, TestCase(1), Priority(1)]
+        [SkippableFact, TestCase(1), Priority(1)]
         public void VerifyTestCaseOneIsFoundViaWebDriver() => TrashTafTestAdapter.Execute((ctx, webDriver) =>
         {
             // Arrange
