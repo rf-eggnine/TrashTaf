@@ -102,6 +102,11 @@ namespace Eggnine.TrashTaf.XUnit
                     webDriver = new FirefoxDriver();
                     break;
                 case "edge":
+                    if(!ctx.OperatingSystemName.Equals("Windows", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Console.WriteLine($"Skipping test {ctx.ClassName}.{ctx.TestName} because edge won't run on {ctx.OperatingSystemName}");
+                        Skip.If(true, $"edge won't run on {ctx.OperatingSystemName}");
+                    }
                     var edgeOptions = new EdgeOptions();
                     if (ctx.IsHeadless)
                     {
@@ -110,6 +115,11 @@ namespace Eggnine.TrashTaf.XUnit
                     webDriver = new EdgeDriver(edgeOptions);
                     break;
                 case "safari":
+                    if (!ctx.OperatingSystemName.Equals("MacOs", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Console.WriteLine($"Skipping test {ctx.ClassName}.{ctx.TestName} because safari won't run on {ctx.OperatingSystemName}");
+                        Skip.If(true, $"safari won't run on {ctx.OperatingSystemName}");
+                    }
                     if (ctx.IsHeadless)
                     {
                         throw new Exception("Safari doesn't support headless mode");
