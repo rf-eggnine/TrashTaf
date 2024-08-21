@@ -6,6 +6,8 @@ on:
   pull_request: 
     branches: [ "main" ] 
 
+env: 
+    DISPLAY: :99     
 
 jobs: 
   tests: 
@@ -13,7 +15,7 @@ jobs:
       fail-fast: false 
       matrix: 
         operatingSystem: [ ubuntu-22.04, ubuntu-24.04, windows-2019, windows-2022, macos-12, macos-13] 
-        browser: ["chrome", 'firefox', 'edge', 'safari'] 
+        browser: ["chrome", 'firefox', 'edge'] 
 
     runs-on: ${{ format('{0}', matrix.operatingSystem) }} 
 
@@ -30,9 +32,6 @@ jobs:
     - name: Start Xvfb 
       if: runner.os == 'Ubuntu' && matrix.browser == 'firefox' 
       run: Xvfb :99 & 
-    - name: Export display 
-      if: runner.os == 'Ubuntu' && matrix.browser == 'firefox' 
-      run: export DISPLAY=:99 
     - uses: 1arp/create-a-file-action@0.4.5 
       with: 
         path: Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/ 
