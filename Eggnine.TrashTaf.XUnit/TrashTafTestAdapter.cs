@@ -10,6 +10,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Safari;
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using Xunit;
@@ -83,6 +84,7 @@ namespace Eggnine.TrashTaf.XUnit
             }
             Console.WriteLine("Starting WebDriver");
             WebDriver webDriver;
+            Func<WebDriver> webDriverFunc;
             switch (ctx.BrowserName)
             {
                 case "chrome":
@@ -91,7 +93,7 @@ namespace Eggnine.TrashTaf.XUnit
                     {
                         chromeOptions.AddArgument("--headless=new");
                     }
-                    webDriver = new ChromeDriver(chromeOptions);
+                    webDriverFunc = () => new ChromeDriver(chromeOptions);
                     break;
                 case "firefox":
                     var firefoxOptions = new FirefoxOptions();
@@ -99,7 +101,7 @@ namespace Eggnine.TrashTaf.XUnit
                     {
                         firefoxOptions.AddArgument("--headless");
                     }
-                    webDriver = new FirefoxDriver();
+                    webDriverFunc = () => new FirefoxDriver();
                     break;
                 case "edge":
                     if(!ctx.OperatingSystemName.Equals("Windows", StringComparison.OrdinalIgnoreCase))
@@ -112,7 +114,7 @@ namespace Eggnine.TrashTaf.XUnit
                     {
                         edgeOptions.AddArgument("--headless=new");
                     }
-                    webDriver = new EdgeDriver(edgeOptions);
+                    webDriverFunc = () => new EdgeDriver(edgeOptions);
                     break;
                 case "safari":
                     if (!ctx.OperatingSystemName.Equals("MacOs", StringComparison.OrdinalIgnoreCase))
@@ -124,7 +126,7 @@ namespace Eggnine.TrashTaf.XUnit
                     {
                         throw new Exception("Safari doesn't support headless mode");
                     }
-                    webDriver = new SafariDriver();
+                    webDriverFunc = () => new SafariDriver();
                     break;
                 case "android":
                     var androidOptions = new AppiumOptions();
@@ -132,7 +134,7 @@ namespace Eggnine.TrashTaf.XUnit
                     {
                         androidOptions.AddAdditionalAppiumOption("isHeadless", true);
                     }
-                    webDriver = new AndroidDriver(androidOptions);
+                    webDriverFunc = () => new AndroidDriver(androidOptions);
                     break;
                 case "ios":
                     var iosOptions = new AppiumOptions();
@@ -140,11 +142,12 @@ namespace Eggnine.TrashTaf.XUnit
                     {
                         iosOptions.AddAdditionalAppiumOption("isHeadless", true);
                     }
-                    webDriver = new IOSDriver(iosOptions);
+                    webDriverFunc = () => new IOSDriver(iosOptions);
                     break;
                 default:
                     throw new Exception($"Unknown browser {ctx.BrowserName} please use chrome, firefox, edge, safari, android, or ios");
             };
+            webDriver = StartWebDriverWithRetries(webDriverFunc);
             Console.WriteLine("WebDriver started");
             (webDriver as IJavaScriptExecutor).ExecuteScript("console.log('WebDriver started');");
             try
@@ -165,6 +168,30 @@ namespace Eggnine.TrashTaf.XUnit
             {
                 Console.WriteLine("Tearing down WebDriver");
                 webDriver.Quit();
+            }
+        }
+
+        /// <summary>
+        /// Starts the WebDriver with retry-able exceptions
+        /// </summary>
+        /// <param name="webDriverFunc"></param>
+        /// <returns></returns>
+        private WebDriver StartWebDriverWithRetries(Func<WebDriver> webDriverFunc)
+        {
+            int i = 0;
+            while (true)
+            {
+                try
+                {
+                    return webDriverFunc();
+                }
+                catch (WebDriverException)
+                {
+                    Console.WriteLine($"WebDriver start failed on attempt {i}");
+                    if (i > 4)
+                        throw;
+                }
+                i++;
             }
         }
 
