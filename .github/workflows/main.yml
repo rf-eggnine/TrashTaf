@@ -18,8 +18,8 @@ jobs:
     runs-on: ${{ format('{0}', matrix.operatingSystem) }} 
 
     steps: 
-    - name: echo path
-      run: echo $PATH | tr ':' '\n' 
+    - name: pwd 
+      run: pwd 
     - uses: actions/checkout@v4 
     - name: Setup .NET 
       uses: actions/setup-dotnet@v4 
