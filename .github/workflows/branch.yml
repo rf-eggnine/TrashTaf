@@ -1,0 +1,36 @@
+name: Eggnine.TrashTaf_branch 
+
+on: 
+  push: 
+    branches: [ "*" ] 
+
+env: 
+    DISPLAY: :99     
+
+jobs: 
+  tests: 
+    strategy: 
+      fail-fast: false 
+      matrix: 
+        operatingSystem: [ ubuntu-24.04] 
+        browser: ["chrome"] 
+
+    runs-on: ${{ format('{0}', matrix.operatingSystem) }} 
+
+    steps: 
+    - uses: actions/checkout@v4 
+    - name: Setup .NET 
+      uses: actions/setup-dotnet@v4 
+      with: 
+        dotnet-version: 8.0.x 
+    - name: Restore dependencies 
+      run: dotnet restore 
+    - name: Build 
+      run: dotnet build --no-restore 
+    - uses: 1arp/create-a-file-action@0.4.5 
+      with: 
+        path: Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/ 
+        file: appSettings.json 
+        content: "{ 'browserName': '${{ matrix.browser }}', 'browserMajorVersion': 'latest', 'operatingSystemNameAndMajorVersion': '${{ matrix.operatingSystem }}', 'isHeadless': true, 'username': '$Username', 'password': '$Password' }" 
+    - name: Test ${{ matrix.browser }} on ${{ matrix.operatingSystem }} 
+      run: dotnet test --no-build --verbosity normal 

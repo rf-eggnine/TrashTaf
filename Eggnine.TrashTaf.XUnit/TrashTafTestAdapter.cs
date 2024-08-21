@@ -106,8 +106,7 @@ namespace Eggnine.TrashTaf.XUnit
                 case "edge":
                     if(!ctx.OperatingSystemName.Equals("Windows", StringComparison.OrdinalIgnoreCase))
                     {
-                        Console.WriteLine($"Skipping test {ctx.ClassName}.{ctx.TestName} because edge won't run on {ctx.OperatingSystemName}");
-                        Skip.If(true, $"edge won't run on {ctx.OperatingSystemName}");
+                        throw new Exception("Edge only runs on Windows");
                     }
                     var edgeOptions = new EdgeOptions();
                     if (ctx.IsHeadless)
@@ -119,8 +118,7 @@ namespace Eggnine.TrashTaf.XUnit
                 case "safari":
                     if (!ctx.OperatingSystemName.Equals("MacOs", StringComparison.OrdinalIgnoreCase))
                     {
-                        Console.WriteLine($"Skipping test {ctx.ClassName}.{ctx.TestName} because safari won't run on {ctx.OperatingSystemName}");
-                        Skip.If(true, $"safari won't run on {ctx.OperatingSystemName}");
+                        throw new Exception("Safari only runs on MacOs");
                     }
                     if (ctx.IsHeadless)
                     {
