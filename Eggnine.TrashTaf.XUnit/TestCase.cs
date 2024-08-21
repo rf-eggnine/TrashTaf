@@ -1,5 +1,5 @@
 ﻿// TrashTaf © 2024 by RF@EggNine.com All Rights Reserved
-namespace TrashTaf.XUnit
+namespace Eggnine.TrashTaf.XUnit
 {
     public class TestCase : Attribute
     {

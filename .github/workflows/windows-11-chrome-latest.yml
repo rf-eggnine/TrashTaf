@@ -1,0 +1,31 @@
+name: Windows 11 Chrome Latest
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: windows-11
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - uses: 1arp/create-a-file-action@0.4.5
+      with:
+        path: /home/runner/work/TrashTaf/TrashTaf/TrashTaf.XUnit/bin/Debug/net8.0/
+        isAbsolutePath: true 
+        file: appSettings.json
+        content: "{ 'browserName': 'chrome', 'browserMajorVersion': 'latest', 'operatingSystemName': 'windows', 'operatingSystemMajorVersion': '11', 'isHeadless': true, 'username': '$Username', 'password': '$Password' }" 
+    - name: Test
+      run: dotnet test --no-build --verbosity normal

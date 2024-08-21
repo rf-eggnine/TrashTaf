@@ -1,4 +1,5 @@
 ﻿// TrashTaf © 2024 by RF@EggNine.com All Rights Reserved
+using Eggnine.TrashTaf.XUnit.SkipAttributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
@@ -10,8 +11,9 @@ using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Safari;
 using System.Diagnostics;
+using Xunit;
 
-namespace TrashTaf.XUnit
+namespace Eggnine.TrashTaf.XUnit
 {
     public class TrashTafTestAdapter
     {
@@ -22,11 +24,11 @@ namespace TrashTaf.XUnit
             using Stream stream = File.OpenRead("appSettings.json");
             using StreamReader reader = new StreamReader(stream);
             JToken token = JsonConvert.DeserializeObject<JToken>(reader.ReadToEnd());
-            foreach(JToken child in token.Children())
+            foreach (JToken child in token.Children())
             {
-                if(child is JProperty property)
+                if (child is JProperty property)
                 {
-                    switch(property.Name)
+                    switch (property.Name)
                     {
                         case "browserName":
                             TrashContext.BrowserName = property.Value.ToString();
@@ -58,14 +60,31 @@ namespace TrashTaf.XUnit
             Console.WriteLine($"Operating System: {TrashContext.OperatingSystemName} {TrashContext.OperatingSystemMajorVersion}");
         }
 
+        /// <summary>
+        /// Provides integration points for supported features before and after the test
+        /// </summary>
+        /// <param name="test"></param>
+        /// <exception cref="Exception"></exception>
         public void ExecuteTest(Action<TrashContext, WebDriver> test)
         {
             var ctx = TrashContext;
             var stackTrace = new StackTrace();
-            ctx.TestName = stackTrace.GetFrame(2).GetMethod().Name;
-            ctx.ClassName = stackTrace.GetFrame(2).GetMethod().ReflectedType.Name;
-            ctx.TestCaseId = (int)stackTrace.GetFrame(2).GetMethod().CustomAttributes.First(a => a.AttributeType == typeof(TestCase)).ConstructorArguments[0].Value;
+            var testMethod = stackTrace.GetFrame(2).GetMethod();
+            ctx.TestName = testMethod.Name;
+            ctx.ClassName = testMethod.ReflectedType.Name;
+            ctx.TestCaseId = (int)testMethod.CustomAttributes.First(a => a.AttributeType == typeof(TestCase)).ConstructorArguments[0].Value;
+            ctx.Priority = (int)testMethod.CustomAttributes.First(a => a.AttributeType == typeof(Priority)).ConstructorArguments[0].Value;
             Console.WriteLine($"Begining pre-execution for test case #{ctx.TestCaseId} {ctx.ClassName}.{ctx.TestName}");
+            IEnumerable<SkipIf> skipIfs = testMethod.CustomAttributes.Where(a => a.AttributeType.IsAssignableFrom(typeof(SkipIf))).Cast<SkipIf>();
+            Console.WriteLine($"checking if test case should be skipped");
+            foreach(SkipIf skipIf in skipIfs)
+            {
+                if(skipIf.Matches(ctx))
+                {
+                    Console.WriteLine($"skipping test because {skipIf.Reason(ctx)}");
+                }
+                Skip.If(skipIf.Matches(ctx), skipIf.Reason(ctx));
+            }
             Console.WriteLine("Starting WebDriver");
             WebDriver webDriver;
             switch (ctx.BrowserName)
@@ -141,6 +160,10 @@ namespace TrashTaf.XUnit
             }
         }
 
+        /// <summary>
+        /// Convenience method for Tests to call
+        /// </summary>
+        /// <param name="test"></param>
         public static void Execute(Action<TrashContext, WebDriver> test) => new TrashTafTestAdapter().ExecuteTest(test);
     }
 }
