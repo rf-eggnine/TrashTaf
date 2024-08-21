@@ -2,7 +2,7 @@ name: Eggnine.TrashTaf_branch
 
 on: 
   push: 
-    branches: [ "!main" ]    
+    branches: [ "*", "!main" ]    
 
 jobs: 
   tests: 
