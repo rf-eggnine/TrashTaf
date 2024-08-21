@@ -29,10 +29,10 @@ jobs:
         content: "{ 'browserName': 'chrome', 'browserMajorVersion': 'latest', 'operatingSystemName': 'ubuntu', 'operatingSystemMajorVersion': '22.04', 'isHeadless': true, 'username': '$Username', 'password': '$Password' }" 
     - name: Test
       run: dotnet test --no-build --verbosity normal
-    - name: Start Xvfb
-      run: Xvfb :99 &
-    - name: Export display
-      run: export DISPLAY=:0
+    #- name: Start Xvfb
+     # run: Xvfb :99 &
+    #- name: Export display
+     # run: export DISPLAY=:0
     - uses: 1arp/create-a-file-action@0.4.5
       with:
         path: /home/runner/work/TrashTaf/TrashTaf/Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/
