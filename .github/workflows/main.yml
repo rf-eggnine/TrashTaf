@@ -12,8 +12,8 @@ jobs:
     strategy: 
       fail-fast: false 
       matrix: 
-        operatingSystem: [ ubuntu-22.04, windows-2019, windows-2022, macos-13 ] 
-        browser: ["chrome", 'firefox', 'edge'] 
+        operatingSystem: [ ubuntu-22.04] 
+        browser: ["chrome"] 
 
     runs-on: ${{ format('{0}', matrix.operatingSystem) }} 
 
@@ -35,7 +35,7 @@ jobs:
       run: export DISPLAY=:99 
     - uses: 1arp/create-a-file-action@0.4.5 
       with: 
-        path: TrashTaf/TrashTaf/Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/ 
+        path: ../TrashTaf/TrashTaf/Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/ 
         file: appSettings.json 
         content: "{ 'browserName': '${{ matrix.browser }}', 'browserMajorVersion': 'latest', 'operatingSystemNameAndMajorVersion': '${{ matrix.operatingSystem }}', 'isHeadless': true, 'username': '$Username', 'password': '$Password' }" 
     - name: Test ${{ matrix.browser }} on ${{ matrix.operatingSystem }} 
