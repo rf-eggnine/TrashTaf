@@ -12,6 +12,20 @@ namespace Eggnine.TrashTaf.XUnit.Tests
             Assert.Equal("windows", ctx.OperatingSystemName, comparer);
             Assert.Equal("chrome", ctx.BrowserName, comparer);
         });
+        [SkippableFact, TestCase(21), Priority(2), SkipIfOsIsNot("windows"), SkipIfBrowserIsNot("firefox")]
+        public void VerifyTestRunsOnWindowsWithFirefox() => TrashTafTestAdapter.Execute((ctx, webDriver) =>
+        {
+            StringComparer comparer = StringComparer.OrdinalIgnoreCase;
+            Assert.Equal("windows", ctx.OperatingSystemName, comparer);
+            Assert.Equal("firefox", ctx.BrowserName, comparer);
+        });
+        [SkippableFact, TestCase(22), Priority(2), SkipIfOsIsNot("windows"), SkipIfBrowserIsNot("edge")]
+        public void VerifyTestRunsOnWindowsWithEdge() => TrashTafTestAdapter.Execute((ctx, webDriver) =>
+        {
+            StringComparer comparer = StringComparer.OrdinalIgnoreCase;
+            Assert.Equal("windows", ctx.OperatingSystemName, comparer);
+            Assert.Equal("edge", ctx.BrowserName, comparer);
+        });
         [SkippableFact, TestCase(19), Priority(2), SkipIfOsIsNot("ubuntu"), SkipIfBrowserIsNot("chrome")]
         public void VerifyTestRunsOnUbuntuWithChrome() => TrashTafTestAdapter.Execute((ctx, webDriver) =>
         {
