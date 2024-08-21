@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: windows-11
+    runs-on: windows-2019
 
     steps:
     - uses: actions/checkout@v4
@@ -26,6 +26,6 @@ jobs:
         path: /home/runner/work/TrashTaf/TrashTaf/TrashTaf.XUnit/bin/Debug/net8.0/
         isAbsolutePath: true 
         file: appSettings.json
-        content: "{ 'browserName': 'chrome', 'browserMajorVersion': 'latest', 'operatingSystemName': 'windows', 'operatingSystemMajorVersion': '11', 'isHeadless': true, 'username': '$Username', 'password': '$Password' }" 
+        content: "{ 'browserName': 'chrome', 'browserMajorVersion': 'latest', 'operatingSystemName': 'windows', 'operatingSystemMajorVersion': '2019', 'isHeadless': true, 'username': '$Username', 'password': '$Password' }" 
     - name: Test
       run: dotnet test --no-build --verbosity normal

@@ -15,7 +15,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{1FD03BA6-C787-4FF9-9CDD-0A177D20966F}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\ubuntu-22.04-chrome-latest.yml = .github\workflows\ubuntu-22.04-chrome-latest.yml
-		.github\workflows\windows-11-chrome-latest.yml = .github\workflows\windows-11-chrome-latest.yml
+		.github\workflows\windows-2019-chrome-latest.yml = .github\workflows\windows-2019-chrome-latest.yml
 	EndProjectSection
 EndProject
 Global
