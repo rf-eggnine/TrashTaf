@@ -2,10 +2,7 @@ name: Eggnine.TrashTaf_monthly_safari
 
 on:
   schedule:
-  - cron: 0 18 1 */1 *      
-
-env: 
-    DISPLAY: :99     
+  - cron: 0 18 1 */1 *   
 
 jobs: 
   tests: 
