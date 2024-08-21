@@ -12,8 +12,8 @@ jobs:
     strategy: 
       fail-fast: false 
       matrix: 
-        operatingSystem: [ ubuntu-22.04] 
-        browser: ["chrome"] 
+        operatingSystem: [ ubuntu-22.04, ubuntu-24.04, windows-2019, windows-2022, macos-12, macos-13] 
+        browser: ["chrome", 'firefox', 'edge', 'safari'] 
 
     runs-on: ${{ format('{0}', matrix.operatingSystem) }} 
 
