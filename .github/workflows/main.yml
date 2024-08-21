@@ -30,7 +30,7 @@ jobs:
     - name: Build 
       run: dotnet build --no-restore 
     - name: Start Xvfb 
-      if: runner.os == 'ubuntu' && matrix.browser == 'firefox' 
+      if: (matrix.operatingSystem == 'ubuntu-22.04' || matrix.operatingSystem == 'ubuntu-24.04') && matrix.browser == 'firefox' 
       run: Xvfb :99 & 
     - uses: 1arp/create-a-file-action@0.4.5 
       with: 
