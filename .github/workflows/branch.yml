@@ -9,7 +9,7 @@ jobs:
     strategy: 
       fail-fast: false 
       matrix: 
-        operatingSystem: [ ubuntu-latest] 
+        operatingSystem: [ windows-latest] 
         browser: ["chrome"] 
 
     runs-on: ${{ format('{0}', matrix.operatingSystem) }} 
