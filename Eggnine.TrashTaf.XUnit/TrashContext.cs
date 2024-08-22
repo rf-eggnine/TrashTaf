@@ -1,5 +1,7 @@
 ﻿// TrashTaf © 2024 by RF@EggNine.com All Rights Reserved
 
+using System.Reflection;
+
 namespace Eggnine.TrashTaf.XUnit
 {
     public class TrashContext
@@ -18,5 +20,15 @@ namespace Eggnine.TrashTaf.XUnit
         public bool IsHeadless;
 
         public int Priority { get; internal set; }
+
+        internal void SetPriority(MethodBase testMethod)
+        {
+            Priority = (int)testMethod.CustomAttributes.First(a => a.AttributeType == typeof(Priority)).ConstructorArguments[0].Value;
+        }
+
+        internal void SetTestCaseId(MethodBase testMethod)
+        {
+            TestCaseId = (int)testMethod.CustomAttributes.First(a => a.AttributeType == typeof(TestCase)).ConstructorArguments[0].Value;
+        }
     }
 }

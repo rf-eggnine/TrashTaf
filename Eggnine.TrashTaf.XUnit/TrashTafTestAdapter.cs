@@ -10,16 +10,18 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Safari;
-using System;
 using System.Diagnostics;
 using System.Reflection;
-using Xunit;
 
 namespace Eggnine.TrashTaf.XUnit
 {
     public class TrashTafTestAdapter
     {
         public TrashContext TrashContext;
+        private Exception firstException;
+        private Exception secondException;
+        private Exception thirdException;
+
         public TrashTafTestAdapter()
         {
             TrashContext = new();
@@ -73,102 +75,143 @@ namespace Eggnine.TrashTaf.XUnit
             var testMethod = stackTrace.GetFrame(2).GetMethod();
             ctx.TestName = testMethod.Name;
             ctx.ClassName = testMethod.ReflectedType.Name;
-            ctx.TestCaseId = (int)testMethod.CustomAttributes.First(a => a.AttributeType == typeof(TestCase)).ConstructorArguments[0].Value;
-            ctx.Priority = (int)testMethod.CustomAttributes.First(a => a.AttributeType == typeof(Priority)).ConstructorArguments[0].Value;
+            ctx.SetTestCaseId(testMethod);
+            ctx.SetPriority(testMethod);
             Console.WriteLine($"Begining pre-execution for test case #{ctx.TestCaseId} {ctx.ClassName}.{ctx.TestName}");
             IEnumerable<SkipIf> skipIfs = testMethod.GetCustomAttributes().Where(a => a is SkipIf).Cast<SkipIf>();
             Console.WriteLine($"Checking if test case should be skipped");
-            foreach(SkipIf skipIf in skipIfs)
+            foreach (SkipIf skipIf in skipIfs)
             {
                 skipIf.True(ctx);
             }
-            Console.WriteLine("Starting WebDriver");
-            WebDriver webDriver;
-            Func<WebDriver> webDriverFunc;
-            switch (ctx.BrowserName)
+
+            while (true)
             {
-                case "chrome":
-                    var chromeService = ChromeDriverService.CreateDefaultService();
-                    chromeService.LogPath = "chromelog.txt";
-                    chromeService.EnableVerboseLogging = true;
-                    var chromeOptions = new ChromeOptions();
-                    if (ctx.IsHeadless)
+                try
+                {
+                    Console.WriteLine("Starting WebDriver");
+                    WebDriver webDriver;
+                    Func<WebDriver> webDriverFunc;
+                    switch (ctx.BrowserName)
                     {
-                        chromeOptions.AddArgument("--headless=new");
-                    }
-                    webDriverFunc = () => new ChromeDriver(chromeService, chromeOptions);
-                    break;
-                case "firefox":
-                    var firefoxOptions = new FirefoxOptions();
-                    if (ctx.IsHeadless)
+                        case "chrome":
+                            var chromeService = ChromeDriverService.CreateDefaultService();
+                            chromeService.LogPath = "chromelog.txt";
+                            chromeService.EnableVerboseLogging = true;
+                            var chromeOptions = new ChromeOptions();
+                            if (ctx.IsHeadless)
+                            {
+                                chromeOptions.AddArgument("--headless=new");
+                            }
+                            webDriverFunc = () => new ChromeDriver(chromeService, chromeOptions);
+                            break;
+                        case "firefox":
+                            var firefoxOptions = new FirefoxOptions();
+                            if (ctx.IsHeadless)
+                            {
+                                firefoxOptions.AddArgument("--headless");
+                            }
+                            webDriverFunc = () => new FirefoxDriver();
+                            break;
+                        case "edge":
+                            if (!ctx.OperatingSystemName.Equals("Windows", StringComparison.OrdinalIgnoreCase))
+                            {
+                                throw new Exception("Edge only runs on Windows");
+                            }
+                            var edgeOptions = new EdgeOptions();
+                            if (ctx.IsHeadless)
+                            {
+                                edgeOptions.AddArgument("--headless=new");
+                            }
+                            webDriverFunc = () => new EdgeDriver(edgeOptions);
+                            break;
+                        case "safari":
+                            if (!ctx.OperatingSystemName.Equals("MacOs", StringComparison.OrdinalIgnoreCase))
+                            {
+                                throw new Exception("Safari only runs on MacOs");
+                            }
+                            if (ctx.IsHeadless)
+                            {
+                                throw new Exception("Safari doesn't support headless mode");
+                            }
+                            webDriverFunc = () => new SafariDriver();
+                            break;
+                        case "android":
+                            var androidOptions = new AppiumOptions();
+                            if (ctx.IsHeadless)
+                            {
+                                androidOptions.AddAdditionalAppiumOption("isHeadless", true);
+                            }
+                            webDriverFunc = () => new AndroidDriver(androidOptions);
+                            break;
+                        case "ios":
+                            var iosOptions = new AppiumOptions();
+                            if (ctx.IsHeadless)
+                            {
+                                iosOptions.AddAdditionalAppiumOption("isHeadless", true);
+                            }
+                            webDriverFunc = () => new IOSDriver(iosOptions);
+                            break;
+                        default:
+                            throw new Exception($"Unknown browser {ctx.BrowserName} please use chrome, firefox, edge, safari, android, or ios");
+                    };
+                    webDriver = StartWebDriverWithRetries(webDriverFunc);
+                    Console.WriteLine("WebDriver started");
+                    (webDriver as IJavaScriptExecutor).ExecuteScript("console.log('WebDriver started');");
+                    try
                     {
-                        firefoxOptions.AddArgument("--headless");
+                        Console.WriteLine("Executing test action");
+                        (webDriver as IJavaScriptExecutor).ExecuteScript("console.log('Executing test action');");
+                        test(ctx, webDriver);
+
+                        Console.WriteLine("Begining post execution");
+                        (webDriver as IJavaScriptExecutor).ExecuteScript("console.log('Begining post execution');");
                     }
-                    webDriverFunc = () => new FirefoxDriver();
-                    break;
-                case "edge":
-                    if(!ctx.OperatingSystemName.Equals("Windows", StringComparison.OrdinalIgnoreCase))
+                    catch (Exception ex)
                     {
-                        throw new Exception("Edge only runs on Windows");
+                        Console.WriteLine($"Test failed: {ctx.ClassName}.{ctx.TestName} with exception {ex.GetType().FullName} because {ex.Message}");
+                        ctx.Exception = ex;
+                        throw;
                     }
-                    var edgeOptions = new EdgeOptions();
-                    if (ctx.IsHeadless)
+                    finally
                     {
-                        edgeOptions.AddArgument("--headless=new");
+                        Console.WriteLine("Tearing down WebDriver");
+                        webDriver.Quit();
                     }
-                    webDriverFunc = () => new EdgeDriver(edgeOptions);
-                    break;
-                case "safari":
-                    if (!ctx.OperatingSystemName.Equals("MacOs", StringComparison.OrdinalIgnoreCase))
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"test {ctx.ClassName}.{ctx.TestName} failed with {ex.GetType().Name} stating {ex.Message}");
+                    if (firstException != null)
                     {
-                        throw new Exception("Safari only runs on MacOs");
+                        if (secondException != null)
+                        {
+                            if (firstException.GetType() == secondException.GetType() && secondException.GetType() == ex.GetType())
+                            {
+                                if (firstException.Message.Equals(secondException.Message) && secondException.Message.Equals(ex.Message))
+                                    throw;
+                            }
+                            firstException = ex;
+                            secondException = null;
+                        }
+                        else
+                        {
+                            if (ex.GetType() == firstException.GetType() && ex.Message.Equals(firstException.Message))
+                            {
+                                secondException = ex;
+                            }
+                            else
+                            {
+                                firstException = ex;
+                                secondException = null;
+                            }
+                        }
                     }
-                    if (ctx.IsHeadless)
+                    else
                     {
-                        throw new Exception("Safari doesn't support headless mode");
+                        firstException = ex;
                     }
-                    webDriverFunc = () => new SafariDriver();
-                    break;
-                case "android":
-                    var androidOptions = new AppiumOptions();
-                    if (ctx.IsHeadless)
-                    {
-                        androidOptions.AddAdditionalAppiumOption("isHeadless", true);
-                    }
-                    webDriverFunc = () => new AndroidDriver(androidOptions);
-                    break;
-                case "ios":
-                    var iosOptions = new AppiumOptions();
-                    if (ctx.IsHeadless)
-                    {
-                        iosOptions.AddAdditionalAppiumOption("isHeadless", true);
-                    }
-                    webDriverFunc = () => new IOSDriver(iosOptions);
-                    break;
-                default:
-                    throw new Exception($"Unknown browser {ctx.BrowserName} please use chrome, firefox, edge, safari, android, or ios");
-            };
-            webDriver = StartWebDriverWithRetries(webDriverFunc);
-            Console.WriteLine("WebDriver started");
-            (webDriver as IJavaScriptExecutor).ExecuteScript("console.log('WebDriver started');");
-            try
-            {
-                Console.WriteLine("Executing test action");
-                (webDriver as IJavaScriptExecutor).ExecuteScript("console.log('Executing test action');");
-                test(ctx, webDriver);
-                Console.WriteLine("Begining post execution");
-                (webDriver as IJavaScriptExecutor).ExecuteScript("console.log('Begining post execution');");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Test failed: {ctx.ClassName}.{ctx.TestName} with exception {ex.GetType().FullName} because {ex.Message}");
-                ctx.Exception = ex;
-                throw;
-            }
-            finally
-            {
-                Console.WriteLine("Tearing down WebDriver");
-                webDriver.Quit();
+                }
             }
         }
 
