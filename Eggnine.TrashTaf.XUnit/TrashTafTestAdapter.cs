@@ -88,12 +88,15 @@ namespace Eggnine.TrashTaf.XUnit
             switch (ctx.BrowserName)
             {
                 case "chrome":
+                    var chromeService = ChromeDriverService.CreateDefaultService();
+                    chromeService.LogPath = "chromelog.txt";
+                    chromeService.EnableVerboseLogging = true;
                     var chromeOptions = new ChromeOptions();
                     if (ctx.IsHeadless)
                     {
                         chromeOptions.AddArgument("--headless=new");
                     }
-                    webDriverFunc = () => new ChromeDriver(chromeOptions);
+                    webDriverFunc = () => new ChromeDriver(chromeService, chromeOptions);
                     break;
                 case "firefox":
                     var firefoxOptions = new FirefoxOptions();

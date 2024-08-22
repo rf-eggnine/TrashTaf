@@ -31,3 +31,23 @@ jobs:
         content: "{ 'browserName': '${{ matrix.browser }}', 'browserMajorVersion': 'latest', 'operatingSystemNameAndMajorVersion': '${{ matrix.operatingSystem }}', 'isHeadless': true, 'username': '$Username', 'password': '$Password' }" 
     - name: Test ${{ matrix.browser }} on ${{ matrix.operatingSystem }} 
       run: dotnet test --no-build --verbosity normal 
+      
+    - name: Export log1 
+      if: always() 
+      run: cat chromelog.txt 
+
+    - name: Export log2 
+      if: always() 
+      run: cat Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/chromelog.txt 
+      
+    - name: Export log3 
+      if: always() 
+      run: cat TrahsTaf/Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/chromelog.txt 
+      
+    - name: Export log4 
+      if: always() 
+      run: cat TrahsTaf/TrahsTaf/Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/chromelog.txt 
+      
+    - name: Export log5 
+      if: always() 
+      run: cat /home/runner/work/TrashTaf/TrashTaf/Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/chromelog.txt 
