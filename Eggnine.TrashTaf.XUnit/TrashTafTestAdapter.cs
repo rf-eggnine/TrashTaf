@@ -166,6 +166,7 @@ namespace Eggnine.TrashTaf.XUnit
 
                         Console.WriteLine("Begining post execution");
                         (webDriver as IJavaScriptExecutor).ExecuteScript("console.log('Begining post execution');");
+                        break;
                     }
                     catch (Exception ex)
                     {
