@@ -83,7 +83,7 @@ jobs:
         path: Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/ 
         file: appSettings.json 
         content: >
-          '{
+          {
           "browserName": "${{ matrix.browser }}", 
           "browserMajorVersion": "latest", 
           "operatingSystemNameAndMajorVersion": "${{ matrix.operatingSystem }}", 
@@ -91,7 +91,7 @@ jobs:
           "gitHubUsername": "${{ secrets.MY_GITHUB_USERNAME }}", 
           "gitHubPassword": "${{ secrets.MY_GITHUB_PASSWORD }}", 
           "databaseConnectionString": "postgresql://${{ secrets.POSTGRES_USERNAME }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/$PGDATABASE" 
-          }' 
+          } 
 #end write the appSettings.json
 
 #start run TrashTaf 
