@@ -1,6 +1,8 @@
 ﻿// TrashTaf © 2024 by RF@EggNine.com All Rights Reserved
 
+using OpenQA.Selenium;
 using System.Reflection;
+using System.Text;
 
 namespace Eggnine.TrashTaf.XUnit
 {
@@ -14,12 +16,31 @@ namespace Eggnine.TrashTaf.XUnit
         public string BrowserMajorVersion;
         public string OperatingSystemName;
         public string OperatingSystemMajorVersion;
-        public string Username;
-        public string Password;
+        public string GitHubUsername;
+        public string GitHubPassword;
         public Exception Exception;
         public bool IsHeadless;
 
         public int Priority { get; internal set; }
+        public long StartTimeMs { get; internal set; }
+        public long StopTimeMs { get; internal set; }
+        public DateTime RunDateTime { get; internal set; }
+        public string Result { get; internal set; }
+        public StringBuilder LogMessages { get; private set; } = new();
+        public WebDriver? WebDriver { get; internal set; }
+        public string DatabaseConnectionString { get; internal set; }
+
+        public void LogMessage(string message)
+        {
+            Console.WriteLine(message);
+            (WebDriver as IJavaScriptExecutor)?.ExecuteScript($"console.log('{message}');");
+            LogMessages.AppendLine(message);
+        }
+
+        internal object GetLogMessages()
+        {
+            return LogMessages.ToString();
+        }
 
         internal void SetPriority(MethodBase testMethod)
         {

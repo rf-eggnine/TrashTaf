@@ -1,5 +1,6 @@
 ﻿// TrashTaf © 2024 by RF@EggNine.com All Rights Reserved
 using Eggnine.TrashTaf.XUnit.SkipAttributes;
+using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
@@ -10,6 +11,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Safari;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -48,19 +50,22 @@ namespace Eggnine.TrashTaf.XUnit
                         case "isHeadless":
                             bool.TryParse(property.Value.ToString(), out TrashContext.IsHeadless);
                             break;
-                        case "username":
-                            TrashContext.Username = property.Value.ToString();
+                        case "gitHubUsername":
+                            TrashContext.GitHubUsername = property.Value.ToString();
                             break;
-                        case "password":
-                            TrashContext.Password = property.Value.ToString();
+                        case "gitHubPassword":
+                            TrashContext.GitHubPassword = property.Value.ToString();
+                            break;
+                        case "databaseConnectionString":
+                            TrashContext.DatabaseConnectionString = property.Value.ToString();
                             break;
                         default:
                             break;
                     }
                 }
             }
-            Console.WriteLine($"Browser: {TrashContext.BrowserName} {TrashContext.BrowserMajorVersion}");
-            Console.WriteLine($"Operating System: {TrashContext.OperatingSystemName} {TrashContext.OperatingSystemMajorVersion}");
+            TrashContext.LogMessage($"Browser: {TrashContext.BrowserName} {TrashContext.BrowserMajorVersion}");
+            TrashContext.LogMessage($"Operating System: {TrashContext.OperatingSystemName} {TrashContext.OperatingSystemMajorVersion}");
         }
 
         /// <summary>
@@ -68,18 +73,20 @@ namespace Eggnine.TrashTaf.XUnit
         /// </summary>
         /// <param name="test"></param>
         /// <exception cref="Exception"></exception>
-        public void ExecuteTest(Action<TrashContext, WebDriver> test)
+        public void ExecuteTest(Action<TrashContext> test)
         {
             var ctx = TrashContext;
+            ctx.RunDateTime = DateTime.UtcNow;
+            ctx.StartTimeMs = GetUnixTimeStamp(ctx.RunDateTime);
             var stackTrace = new StackTrace();
             var testMethod = stackTrace.GetFrame(2).GetMethod();
             ctx.TestName = testMethod.Name;
             ctx.ClassName = testMethod.ReflectedType.Name;
             ctx.SetTestCaseId(testMethod);
             ctx.SetPriority(testMethod);
-            Console.WriteLine($"Begining pre-execution for test case #{ctx.TestCaseId} {ctx.ClassName}.{ctx.TestName}");
+            TrashContext.LogMessage($"Begining pre-execution for test case #{ctx.TestCaseId} {ctx.ClassName}.{ctx.TestName}");
             IEnumerable<SkipIf> skipIfs = testMethod.GetCustomAttributes().Where(a => a is SkipIf).Cast<SkipIf>();
-            Console.WriteLine($"Checking if test case should be skipped");
+            TrashContext.LogMessage($"Checking if test case should be skipped");
             foreach (SkipIf skipIf in skipIfs)
             {
                 skipIf.True(ctx);
@@ -89,7 +96,7 @@ namespace Eggnine.TrashTaf.XUnit
             {
                 try
                 {
-                    Console.WriteLine("Starting WebDriver");
+                    TrashContext.LogMessage("Starting WebDriver");
                     WebDriver webDriver;
                     Func<WebDriver> webDriverFunc;
                     switch (ctx.BrowserName)
@@ -153,36 +160,37 @@ namespace Eggnine.TrashTaf.XUnit
                             webDriverFunc = () => new IOSDriver(iosOptions);
                             break;
                         default:
-                            throw new Exception($"Unknown browser {ctx.BrowserName} please use chrome, firefox, edge, safari, android, or ios");
+                            webDriverFunc = () => null;
+                            break;
                     };
-                    webDriver = StartWebDriverWithRetries(webDriverFunc);
-                    Console.WriteLine("WebDriver started");
-                    (webDriver as IJavaScriptExecutor).ExecuteScript("console.log('WebDriver started');");
+                    ctx.WebDriver = StartWebDriverWithRetries(ctx, webDriverFunc);
+                    TrashContext.LogMessage("WebDriver started");
                     try
                     {
-                        Console.WriteLine("Executing test action");
-                        (webDriver as IJavaScriptExecutor).ExecuteScript("console.log('Executing test action');");
-                        test(ctx, webDriver);
+                        TrashContext.LogMessage("Executing test action");
+                        test(ctx);
 
-                        Console.WriteLine("Begining post execution");
-                        (webDriver as IJavaScriptExecutor).ExecuteScript("console.log('Begining post execution');");
+                        TrashContext.LogMessage("Begining post execution");
+                        ctx.StopTimeMs = GetUnixTimeStamp(DateTime.UtcNow);
+                        RecordTestSuccess(ctx);
                         break;
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Test failed: {ctx.ClassName}.{ctx.TestName} with exception {ex.GetType().FullName} because {ex.Message}");
+                        ctx.LogMessage($"Test failed: {ctx.ClassName}.{ctx.TestName} with exception {ex.GetType().FullName} because {ex.Message}");
                         ctx.Exception = ex;
                         throw;
                     }
                     finally
                     {
-                        Console.WriteLine("Tearing down WebDriver");
-                        webDriver.Quit();
+                        ctx.LogMessage("Tearing down WebDriver");
+                        ctx.WebDriver?.Quit();
+                        ctx.WebDriver = null;
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"test {ctx.ClassName}.{ctx.TestName} failed with {ex.GetType().Name} stating {ex.Message}");
+                    ctx.LogMessage($"test {ctx.ClassName}.{ctx.TestName} failed with {ex.GetType().Name} stating {ex.Message}");
                     if (firstException != null)
                     {
                         if (secondException != null)
@@ -190,7 +198,10 @@ namespace Eggnine.TrashTaf.XUnit
                             if (firstException.GetType() == secondException.GetType() && secondException.GetType() == ex.GetType())
                             {
                                 if (firstException.Message.Equals(secondException.Message) && secondException.Message.Equals(ex.Message))
+                                {
+                                    ctx.StopTimeMs = GetUnixTimeStamp(DateTime.UtcNow);
                                     throw;
+                                }
                             }
                             firstException = ex;
                             secondException = null;
@@ -214,6 +225,44 @@ namespace Eggnine.TrashTaf.XUnit
                     }
                 }
             }
+            ctx.StopTimeMs = GetUnixTimeStamp(DateTime.UtcNow);
+        }
+
+        private void RecordTestSuccess(TrashContext ctx)
+        {
+            DbCommand command = SqlClientFactory.Instance.CreateCommand();
+            command.Connection = new SqlConnection()
+            {
+                ConnectionString = "postgresql://username:password@localhost:5432/database_name",
+            };
+            command.CommandText = "INSERT INTO testRuns (testName, className, runDateTime, durationMs, result, exceptionType, exceptionMessage, operatingSystemName, operatingSystemVersion, browserName, browserVersion, logMessages)" +
+                                              " VALUES (@testName, @className, @runDateTime, @durationMs, @result, @exceptionType, @exceptionMessage, @operatingSystemName, @operatingSystemVersion, @browserName, @browserVersion, @logMessages)";
+            command.Parameters.Add(CreateParameter(command, "testName", ctx.TestName));
+            command.Parameters.Add(CreateParameter(command, "className", ctx.ClassName));
+            command.Parameters.Add(CreateParameter(command, "runDateTime", ctx.RunDateTime));
+            command.Parameters.Add(CreateParameter(command, "durationMs", ctx.StopTimeMs - ctx.StartTimeMs));
+            command.Parameters.Add(CreateParameter(command, "result", ctx.Result));
+            command.Parameters.Add(CreateParameter(command, "exceptionType", ctx.Exception?.GetType().FullName ?? string.Empty));
+            command.Parameters.Add(CreateParameter(command, "exceptionMessage", ctx.Exception?.Message ?? string.Empty));
+            command.Parameters.Add(CreateParameter(command, "operatingSystemName", ctx.OperatingSystemName));
+            command.Parameters.Add(CreateParameter(command, "operatingSystemVersion", ctx.OperatingSystemMajorVersion));
+            command.Parameters.Add(CreateParameter(command, "browserName", ctx.BrowserName));
+            command.Parameters.Add(CreateParameter(command, "browserVersion", ctx.BrowserMajorVersion));
+            command.Parameters.Add(CreateParameter(command, "logMessages", ctx.GetLogMessages()));
+            Assert.Equal(1, command.ExecuteNonQuery());
+        }
+
+        private DbParameter CreateParameter(DbCommand command, string name, object value)
+        {
+            DbParameter parameter = command.CreateParameter();
+            parameter.ParameterName = name;
+            parameter.Value = value;
+            return parameter;
+        }
+
+        private long GetUnixTimeStamp(DateTime time)
+        {
+            return new DateTimeOffset(time).ToUnixTimeSeconds();
         }
 
         /// <summary>
@@ -221,7 +270,7 @@ namespace Eggnine.TrashTaf.XUnit
         /// </summary>
         /// <param name="webDriverFunc"></param>
         /// <returns></returns>
-        private WebDriver StartWebDriverWithRetries(Func<WebDriver> webDriverFunc)
+        private WebDriver StartWebDriverWithRetries(TrashContext ctx, Func<WebDriver> webDriverFunc)
         {
             int i = 0;
             while (true)
@@ -232,11 +281,11 @@ namespace Eggnine.TrashTaf.XUnit
                 }
                 catch (WebDriverException)
                 {
-                    Console.WriteLine($"WebDriver start failed on attempt {i}");
+                    ctx.LogMessage($"WebDriver start failed on attempt {i}");
                     if (i > 4)
                         throw;
+                    i++;
                 }
-                i++;
             }
         }
 
@@ -244,6 +293,6 @@ namespace Eggnine.TrashTaf.XUnit
         /// Convenience method for Tests to call
         /// </summary>
         /// <param name="test"></param>
-        public static void Execute(Action<TrashContext, WebDriver> test) => new TrashTafTestAdapter().ExecuteTest(test);
+        public static void Execute(Action<TrashContext> test) => new TrashTafTestAdapter().ExecuteTest(test);
     }
 }
