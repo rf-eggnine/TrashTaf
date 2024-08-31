@@ -18,8 +18,8 @@ jobs:
     strategy: 
       fail-fast: false 
       matrix: 
-        operatingSystem: [ ubuntu-24.04] 
-        browser: ["chrome"] 
+        operatingSystem: [ ubuntu-24.04 ] 
+        browser: [chrome] 
         
     runs-on: ${{ format('{0}', matrix.operatingSystem) }} 
 
@@ -91,7 +91,7 @@ jobs:
           "gitHubUsername": "${{ secrets.MY_GITHUB_USERNAME }}", 
           "gitHubPassword": "${{ secrets.MY_GITHUB_PASSWORD }}", 
           "databaseConnectionString": "postgresql://${{ secrets.POSTGRES_USERNAME }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/$PGDATABASE" 
-          }'
+          }' 
 #end write the appSettings.json
 
 #start run TrashTaf 
