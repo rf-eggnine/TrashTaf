@@ -10,8 +10,8 @@ env:
     #for postgres 
     PGHOST: localhost 
     PGDATABASE: trash_db 
-    PGUSERNAME: $POSTGRES_USERNAME 
-    PGPASSWORD: $POSTGRES_PASSWORD  
+    PGUSERNAME: ${{ secrets.POSTGRES_USERNAME }} 
+    PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }}  
 
 jobs: 
   tests: 
@@ -88,9 +88,9 @@ jobs:
           'browserMajorVersion': 'latest', 
           'operatingSystemNameAndMajorVersion': '${{ matrix.operatingSystem }}', 
           'isHeadless': true, 
-          'gitHubUsername': '$MY_GITHUB_USERNAME', 
-          'gitHubPassword': '$MY_GITHUB_PASSWORD", 
-          'databaseConnectionString': 'postgresql://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@localhost:5432/database_name' 
+          'gitHubUsername': '${{ secrets.MY_GITHUB_USERNAME }}', 
+          'gitHubPassword': '${{ secrets.MY_GITHUB_PASSWORD }}", 
+          'databaseConnectionString': 'postgresql://${{ secrets.POSTGRES_USERNAME }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/$PGDATABASE' 
           }" 
 #end write the appSettings.json
 
