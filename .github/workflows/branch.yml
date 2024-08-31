@@ -90,7 +90,7 @@ jobs:
           "isHeadless": true, 
           "gitHubUsername": "${{ secrets.MY_GITHUB_USERNAME }}", 
           "gitHubPassword": "${{ secrets.MY_GITHUB_PASSWORD }}", 
-          "databaseConnectionString": "postgresql://${{ secrets.POSTGRES_USERNAME }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/trash_db" 
+          "databaseConnectionString": "postgresql://trash_owner:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/trash_db" 
           } 
 #end write the appSettings.json
 
