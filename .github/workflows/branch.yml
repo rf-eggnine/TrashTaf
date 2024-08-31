@@ -68,7 +68,7 @@ jobs:
 
         echo "Creating database..."
         createdb --owner="$PGUSERNAME" --username="postgres" "$PGDATABASE"
-        psql --host "$PGHOST" --username="$PGUSERNAME" --dbname="$PGDATABASE" init.sql
+        psql --host "$PGHOST" --username="$PGUSERNAME" --dbname="$PGDATABASE" < init.sql
 #end setting up postgress
 
 #start add support for Firefox on ubuntu
