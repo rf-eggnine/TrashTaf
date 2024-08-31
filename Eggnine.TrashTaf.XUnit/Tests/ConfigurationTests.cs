@@ -1,3 +1,4 @@
+// TrashTaf ©️ 2024 by RF@EggNine.com All Rights Reserved
 ﻿using Eggnine.TrashTaf.XUnit.SkipAttributes;
 using System.Globalization;
 
