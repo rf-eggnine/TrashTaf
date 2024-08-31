@@ -99,7 +99,7 @@ jobs:
       run: dotnet test --no-build --verbosity normal 
 #end run TrashTaf
 
-    - name: Export log 
+    - name: Export appsettings 
       if: always() 
-      run: cat Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/chromelog.txt 
+      run: cat Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/appSettings.json 
       
