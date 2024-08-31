@@ -10,7 +10,7 @@ env:
     #for postgres 
     PGHOST: localhost 
     PGDATABASE: trash_db 
-    PGUSERNAME: ${{ secrets.POSTGRES_USERNAME }} 
+    PGUSERNAME: trash_owner 
     PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }}  
 
 jobs: 
