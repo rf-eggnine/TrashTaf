@@ -89,7 +89,7 @@ jobs:
           'operatingSystemNameAndMajorVersion': '${{ matrix.operatingSystem }}', 
           'isHeadless': true, 
           'gitHubUsername': '${{ secrets.MY_GITHUB_USERNAME }}', 
-          'gitHubPassword': '${{ secrets.MY_GITHUB_PASSWORD }}", 
+          'gitHubPassword': '${{ secrets.MY_GITHUB_PASSWORD }}', 
           'databaseConnectionString': 'postgresql://${{ secrets.POSTGRES_USERNAME }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/$PGDATABASE' 
           }" 
 #end write the appSettings.json
