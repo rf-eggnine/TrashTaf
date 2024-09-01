@@ -1,4 +1,4 @@
-name: Eggnine.TrashTaf_monthly_chrome
+name: Eggnine.TrashTaf_monthly_firefox 
 
 on:
   workflow_dispatch: 
