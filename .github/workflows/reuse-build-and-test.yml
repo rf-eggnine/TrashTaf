@@ -58,16 +58,15 @@ jobs:
         export HOMEBREW_NO_INSTALL_CLEANUP=1 
         export HOMEBREW_NO_INSTALL_UPGRADE=1 
         brew install --skip-post-install postgresql@16 
+        brew link --overwrite postgresql@16 
         
-    - name: Add PostgreSQL binaries to PATH 
+    - name: Add PostgreSQL binaries to PATH for Windows and Linux
       shell: bash 
       run: | 
         if [ "$RUNNER_OS" == "Windows" ]; then 
           echo "$PGBIN" >> $GITHUB_PATH 
         elif [ "$RUNNER_OS" == "Linux" ]; then 
           echo "$(pg_config --bindir)" >> $GITHUB_PATH 
-        elif [ "$RUNNER_OS" == "macOS" ]; then 
-          brew link --overwrite postgresql@16 
         fi 
         
     - name: Start PostgreSQL 
