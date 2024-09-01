@@ -9,5 +9,5 @@ jobs:
     uses: rf-eggnine/TrashTaf/.github/workflows/reuse-build-and-test.yml@28-integrates-with-postgresql-for-recording-test-results 
     with: 
       operating-system: ubuntu-24.04 
-      browser: chrome  
+      browser: firefox  
     secrets: inherit 
