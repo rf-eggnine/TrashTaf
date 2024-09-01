@@ -6,7 +6,7 @@ on:
 
 jobs: 
   stub: 
-    uses: rf-eggnine/TrashTaf/.github/workflows/reusable/build-and-test.yml@28-integrates-with-postgresql-for-recording-test-results 
+    uses: rf-eggnine/TrashTaf/.github/workflows/reuse-build-and-test.yml@28-integrates-with-postgresql-for-recording-test-results 
     with: 
       operatingSystem: ubuntu-24.04 
       browser: firefox  
