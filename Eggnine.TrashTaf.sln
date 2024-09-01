@@ -21,6 +21,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{
 		.github\workflows\montly-safari.yml = .github\workflows\montly-safari.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reusable", "Reusable", "{CF135114-E4C1-4BF5-8F79-52B92EF807AB}"
+	ProjectSection(SolutionItems) = preProject
+		.github\reusable\build-and-test.yml = .github\reusable\build-and-test.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

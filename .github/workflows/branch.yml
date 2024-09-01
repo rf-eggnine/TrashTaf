@@ -4,102 +4,10 @@ on:
   push: 
     branches: [ "*", "!main" ] 
 
-env: 
-    #for firefox on ubuntu 
-    DISPLAY: :99 
-    #for postgres 
-    PGHOST: localhost 
-    PGDATABASE: trash_db 
-    PGUSERNAME: trash_owner 
-    PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }}  
-
 jobs: 
-  tests: 
-    strategy: 
-      fail-fast: false 
-      matrix: 
-        operatingSystem: [ ubuntu-24.04 ] 
-        browser: [firefox] 
-        
-    runs-on: ${{ format('{0}', matrix.operatingSystem) }} 
-
-    steps: 
-#start building TrashTaf
-    - uses: actions/checkout@v4 
-    - name: Setup .NET 
-      uses: actions/setup-dotnet@v4 
-      with: 
-        dotnet-version: 8.0.x 
-    - name: Restore dependencies 
-      run: dotnet restore 
-    - name: Build 
-      run: dotnet build --no-restore 
-#end building TrashTaf
-
-#start setting up postgres
-    - name: Add PostgreSQL binaries to PATH
-      shell: bash
-      run: |
-        if [ "$RUNNER_OS" == "Windows" ]; then
-          echo "$PGBIN" >> $GITHUB_PATH
-        elif [ "$RUNNER_OS" == "Linux" ]; then
-          echo "$(pg_config --bindir)" >> $GITHUB_PATH
-        fi
-    - name: Start preinstalled PostgreSQL
-      shell: bash
-      run: |
-        echo "Initializing database cluster..."
-        # Convert backslashes to forward slashes in RUNNER_TEMP for Windows Git Bash
-        export PGHOST="${RUNNER_TEMP//\\//}/postgres"
-        export PGDATA="$PGHOST/pgdata"
-        mkdir -p "$PGDATA"
-
-        # initdb requires file for password in non-interactive mode
-        export PWFILE="$RUNNER_TEMP/pwfile"
-        echo "postgres" > $PWFILE
-        initdb --pgdata="$PGDATA" --username="postgres" --pwfile="$PWFILE"
-
-        echo "Starting PostgreSQL..."
-        echo "unix_socket_directories = '$PGHOST'" >> "$PGDATA/postgresql.conf"
-        pg_ctl start
-
-        echo "Creating user..."
-        psql --host "$PGHOST" --username="postgres" --dbname="postgres" --command="CREATE USER $PGUSERNAME PASSWORD '$PGPASSWORD'" --command="\du"
-
-        echo "Creating database..."
-        createdb --owner="$PGUSERNAME" --username="postgres" "$PGDATABASE"
-        psql --host "$PGHOST" --username="$PGUSERNAME" --dbname="$PGDATABASE" < init.sql
-#end setting up postgress
-
-#start add support for Firefox on ubuntu
-    - name: Start Xvfb 
-      if: (matrix.operatingSystem == 'ubuntu-22.04' || matrix.operatingSystem == 'ubuntu-24.04') && matrix.browser == 'firefox' 
-      run: Xvfb :99 & 
-#end add support for Firefox on ubuntu
-
-#start write the appSettings.json
-    - uses: 1arp/create-a-file-action@0.4.5 
-      with: 
-        path: Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/ 
-        file: appSettings.json 
-        content: >
-          {
-          "browserName": "${{ matrix.browser }}", 
-          "browserMajorVersion": "latest", 
-          "operatingSystemNameAndMajorVersion": "${{ matrix.operatingSystem }}", 
-          "isHeadless": true, 
-          "gitHubUsername": "${{ secrets.MY_GITHUB_USERNAME }}", 
-          "gitHubPassword": "${{ secrets.MY_GITHUB_PASSWORD }}", 
-          "databaseConnectionString": "host=localhost;database=trash_db;username=trash_owner;password=${{ secrets.POSTGRES_PASSWORD }};" 
-          } 
-#end write the appSettings.json
-
-#start run TrashTaf 
-    - name: Test ${{ matrix.browser }} on ${{ matrix.operatingSystem }} 
-      run: dotnet test --no-build --verbosity normal 
-#end run TrashTaf
-
-    - name: Export appsettings 
-      if: always() 
-      run: cat Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/appSettings.json 
-      
+  stub: 
+    uses: rf-eggnine/TrashTaf/.github/reusable/build-and-test.yml
+    with: 
+      operatingSystem: ubuntu-24.04 
+      browser: firefox  
+    secrets: inherit 

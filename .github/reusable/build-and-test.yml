@@ -10,8 +10,15 @@ on:
         required: true 
         type: string 
     secrets: 
-      postgres-password: 
+      POSTGRES-PASSWORD: 
         required: true 
+        type: string 
+      MY-GITHUB-USERNAME: 
+        required: true 
+        type: string 
+      MY-GITHUB-PASSWORD: 
+        required: true 
+        type: string 
 
 env: 
     #for firefox on ubuntu 
@@ -20,10 +27,10 @@ env:
     PGHOST: localhost 
     PGDATABASE: trash_db 
     PGUSERNAME: trash_owner 
-    PGPASSWORD: ${{ secrets.postgres-password }} 
+    PGPASSWORD: ${{ secrets.POSTGRES-PASSWORD }} 
 
 jobs: 
-  build-and-test: 
+  build-and-test-trashtaf: 
     strategy: 
       fail-fast: false 
         
@@ -32,12 +39,15 @@ jobs:
     steps: 
 #start building TrashTaf 
     - uses: actions/checkout@v4 
+  
     - name: Setup .NET 
       uses: actions/setup-dotnet@v4 
       with: 
         dotnet-version: 8.0.x 
+
     - name: Restore dependencies 
       run: dotnet restore 
+
     - name: Build 
       run: dotnet build --no-restore 
 #end building TrashTaf 
@@ -51,6 +61,7 @@ jobs:
         elif [ "$RUNNER_OS" == "Linux" ]; then 
           echo "$(pg_config --bindir)" >> $GITHUB_PATH 
         fi 
+
     - name: Start preinstalled PostgreSQL 
       shell: bash 
       run: | 
@@ -78,8 +89,8 @@ jobs:
 #end setting up postgress 
 
 #start add support for Firefox on ubuntu 
-    - name: Start Xvfb 
-      if: (matrix.operatingSystem == 'ubuntu-22.04' || matrix.operatingSystem == 'ubuntu-24.04') && matrix.browser == 'firefox' 
+    - name: Start Xvfb for Firefox
+      if: ('$RUNNER_OS' == 'Linux' && ''${{ inputs.browser }}' == 'firefox') 
       run: Xvfb :99 & 
 #end add support for Firefox on ubuntu 
 
@@ -90,17 +101,17 @@ jobs:
         file: appSettings.json 
         content: > 
           { 
-          "browserName": "${{ matrix.browser }}", 
+          "browserName": "${{ inputs.browser }}", 
           "browserMajorVersion": "latest", 
-          "operatingSystemNameAndMajorVersion": "${{ matrix.operatingSystem }}", 
+          "operatingSystemNameAndMajorVersion": "${{ inputs.operatingSystem }}", 
           "isHeadless": true, 
-          "gitHubUsername": "${{ secrets.MY_GITHUB_USERNAME }}", 
-          "gitHubPassword": "${{ secrets.MY_GITHUB_PASSWORD }}", 
-          "databaseConnectionString": "host=localhost;database=trash_db;username=trash_owner;password=${{ secrets.POSTGRES_PASSWORD }};" 
+          "gitHubUsername": "${{ secrets.MY-GITHUB-USERNAME }}", 
+          "gitHubPassword": "${{ secrets.MY-GITHUB-PASSWORD }}", 
+          "databaseConnectionString": "host=localhost;database=trash_db;username=trash_owner;password=${{ secrets.POSTGRES-PASSWORD }};" 
           } 
 #end write the appSettings.json 
 
 #start test TrashTaf 
-    - name: Test ${{ matrix.browser }} on ${{ matrix.operatingSystem }} 
+    - name: TrashTaf Test ${{ inputs.browser }} on ${{ inputs.operatingSystem }} 
       run: dotnet test --no-build --verbosity normal 
 #end run TrashTaf 
