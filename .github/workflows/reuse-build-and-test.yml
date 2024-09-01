@@ -103,6 +103,7 @@ jobs:
 #end setting up postgress 
 
     - name: Start Xvfb for Firefox on Ubuntu 
+      shell: bash 
       run: | 
         if [[ "${{ inputs.browser }}" == "firefox" && "$RUNNER_OS" == "Linux" ]]
         then 
