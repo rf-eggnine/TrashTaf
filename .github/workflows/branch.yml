@@ -8,6 +8,6 @@ jobs:
   branch: 
     uses: rf-eggnine/TrashTaf/.github/workflows/reuse-build-and-test.yml@main 
     with: 
-      operating-system: ubuntu-24.04 
+      operating-system: ubuntu-latest
       browser: chrome  
     secrets: inherit 
