@@ -172,11 +172,13 @@ namespace Eggnine.TrashTaf.XUnit
 
                         TrashContext.LogMessage("Begining post execution");
                         ctx.StopTimeMs = GetUnixTimeStamp(DateTime.UtcNow);
-                        RecordTestSuccess(ctx);
+                        ctx.Result = "Passed";
+                        RecordTestResult(ctx);
                         break;
                     }
                     catch (Exception ex)
                     {
+                        ctx.Result = "Failed";
                         ctx.LogMessage($"Test failed: {ctx.ClassName}.{ctx.TestName} with exception {ex.GetType().FullName} because {ex.Message}");
                         ctx.Exception = ex;
                         throw;
@@ -190,6 +192,7 @@ namespace Eggnine.TrashTaf.XUnit
                 }
                 catch (Exception ex)
                 {
+                    ctx.Result = "Failed";
                     ctx.LogMessage($"test {ctx.ClassName}.{ctx.TestName} failed with {ex.GetType().Name} stating {ex.Message}");
                     if (firstException != null)
                     {
@@ -200,6 +203,7 @@ namespace Eggnine.TrashTaf.XUnit
                                 if (firstException.Message.Equals(secondException.Message) && secondException.Message.Equals(ex.Message))
                                 {
                                     ctx.StopTimeMs = GetUnixTimeStamp(DateTime.UtcNow);
+                                    RecordTestResult(ctx);
                                     throw;
                                 }
                             }
@@ -226,29 +230,40 @@ namespace Eggnine.TrashTaf.XUnit
                 }
             }
             ctx.StopTimeMs = GetUnixTimeStamp(DateTime.UtcNow);
+            RecordTestResult(ctx);
         }
 
-        private void RecordTestSuccess(TrashContext ctx)
+        private void RecordTestResult(TrashContext ctx)
         {
             NpgsqlCommand command = new();
-            command.Connection = new NpgsqlConnection(ctx.DatabaseConnectionString);
-            command.Connection.Open();
-            command.CommandText = "INSERT INTO testRuns (testName, className, runDateTime, durationMs, result, exceptionType, exceptionMessage, operatingSystemName, operatingSystemVersion, browserName, browserVersion, logMessages)" +
-                                              " VALUES (@testName, @className, @runDateTime, @durationMs, @result, @exceptionType, @exceptionMessage, @operatingSystemName, @operatingSystemVersion, @browserName, @browserVersion, @logMessages)";
-            command.Parameters.Add(CreateParameter(command, "testName", ctx.TestName));
-            command.Parameters.Add(CreateParameter(command, "className", ctx.ClassName));
-            command.Parameters.Add(CreateParameter(command, "runDateTime", ctx.RunDateTime));
-            command.Parameters.Add(CreateParameter(command, "durationMs", ctx.StopTimeMs - ctx.StartTimeMs));
-            command.Parameters.Add(CreateParameter(command, "result", ctx.Result));
-            command.Parameters.Add(CreateParameter(command, "exceptionType", ctx.Exception?.GetType().FullName ?? string.Empty));
-            command.Parameters.Add(CreateParameter(command, "exceptionMessage", ctx.Exception?.Message ?? string.Empty));
-            command.Parameters.Add(CreateParameter(command, "operatingSystemName", ctx.OperatingSystemName));
-            command.Parameters.Add(CreateParameter(command, "operatingSystemVersion", ctx.OperatingSystemMajorVersion));
-            command.Parameters.Add(CreateParameter(command, "browserName", ctx.BrowserName));
-            command.Parameters.Add(CreateParameter(command, "browserVersion", ctx.BrowserMajorVersion));
-            command.Parameters.Add(CreateParameter(command, "logMessages", ctx.GetLogMessages()));
-            Assert.Equal(1, command.ExecuteNonQuery());
-            command.Connection.Close();
+            try
+            {
+                command.Connection = new NpgsqlConnection(ctx.DatabaseConnectionString);
+                command.Connection.Open();
+                command.CommandText = "INSERT INTO testRuns (testName, className, runDateTime, durationMs, result, exceptionType, exceptionMessage, operatingSystemName, operatingSystemVersion, browserName, browserVersion, logMessages)" +
+                                                  " VALUES (@testName, @className, @runDateTime, @durationMs, @result, @exceptionType, @exceptionMessage, @operatingSystemName, @operatingSystemVersion, @browserName, @browserVersion, @logMessages)";
+                command.Parameters.Add(CreateParameter(command, "testName", ctx.TestName));
+                command.Parameters.Add(CreateParameter(command, "className", ctx.ClassName));
+                command.Parameters.Add(CreateParameter(command, "runDateTime", ctx.RunDateTime));
+                command.Parameters.Add(CreateParameter(command, "durationMs", ctx.StopTimeMs - ctx.StartTimeMs));
+                command.Parameters.Add(CreateParameter(command, "result", ctx.Result));
+                command.Parameters.Add(CreateParameter(command, "exceptionType", ctx.Exception?.GetType().FullName ?? string.Empty));
+                command.Parameters.Add(CreateParameter(command, "exceptionMessage", ctx.Exception?.Message ?? string.Empty));
+                command.Parameters.Add(CreateParameter(command, "operatingSystemName", ctx.OperatingSystemName));
+                command.Parameters.Add(CreateParameter(command, "operatingSystemVersion", ctx.OperatingSystemMajorVersion));
+                command.Parameters.Add(CreateParameter(command, "browserName", ctx.BrowserName));
+                command.Parameters.Add(CreateParameter(command, "browserVersion", ctx.BrowserMajorVersion));
+                command.Parameters.Add(CreateParameter(command, "logMessages", ctx.GetLogMessages()));
+                Assert.Equal(1, command.ExecuteNonQuery());
+            }
+            catch (Exception e)
+            {
+                ctx.LogMessage($"Failed to set test result because of {e.GetType().FullName} with message {e.Message}");
+            }
+            finally
+            {
+                command.Connection?.Close();
+            }
         }
 
         private DbParameter CreateParameter(NpgsqlCommand command, string name, object value)
