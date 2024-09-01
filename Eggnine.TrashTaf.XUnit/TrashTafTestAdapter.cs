@@ -325,7 +325,7 @@ namespace Eggnine.TrashTaf.XUnit
                 {
                     ctx.LogMessage($"WebDriver start failed on attempt {i}");
                     ctx.LogMessage($"Exception {e.GetType().FullName} with message {e.Message}");
-                    if (i > 4)
+                    if (i > 1)
                         throw;
                     i++;
                 }

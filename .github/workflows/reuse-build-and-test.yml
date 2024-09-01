@@ -128,7 +128,7 @@ jobs:
         content: > 
           { 
           "browserName": "${{ inputs.browser }}", 
-          "browserMajorVersion": "${{ inputs.browser-versioin }}", 
+          "browserMajorVersion": "${{ inputs.browser-version }}", 
           "operatingSystemNameAndMajorVersion": "${{ inputs.operating-system }}", 
           "isHeadless": ${{ inputs.is-headless }}, 
           "gitHubUsername": "${{ secrets.MY_GITHUB_USERNAME }}", 
