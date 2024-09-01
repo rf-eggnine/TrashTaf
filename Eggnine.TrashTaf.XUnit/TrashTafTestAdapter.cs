@@ -240,8 +240,8 @@ namespace Eggnine.TrashTaf.XUnit
             {
                 command.Connection = new NpgsqlConnection(ctx.DatabaseConnectionString);
                 command.Connection.Open();
-                command.CommandText = "INSERT INTO testRuns (testName, className, runDateTime, durationMs, result, exceptionType, exceptionMessage, operatingSystemName, operatingSystemVersion, browserName, browserVersion, logMessages)" +
-                                                  " VALUES (@testName, @className, @runDateTime, @durationMs, @result, @exceptionType, @exceptionMessage, @operatingSystemName, @operatingSystemVersion, @browserName, @browserVersion, @logMessages)";
+                command.CommandText = "INSERT INTO testRuns (TestRunId, testName, className, runDateTime, durationMs, result, exceptionType, exceptionMessage, operatingSystemName, operatingSystemVersion, browserName, browserVersion, logMessages)" +
+                                                  " VALUES (DEFAULT, @testName, @className, @runDateTime, @durationMs, @result, @exceptionType, @exceptionMessage, @operatingSystemName, @operatingSystemVersion, @browserName, @browserVersion, @logMessages)";
                 command.Parameters.Add(CreateParameter(command, "testName", ctx.TestName));
                 command.Parameters.Add(CreateParameter(command, "className", ctx.ClassName));
                 command.Parameters.Add(CreateParameter(command, "runDateTime", ctx.RunDateTime));
