@@ -1,5 +1,5 @@
 CREATE TABLE TestRuns (
-    TestRunID SERIAL INT PRIMARY KEY,
+    TestRunID SERIAL PRIMARY KEY,
     TestName VARCHAR(255),
     ClassName VARCHAR(255),
     RunDateTime TIMESTAMP,
