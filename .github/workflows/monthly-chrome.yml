@@ -11,6 +11,7 @@ jobs:
     with: 
       operating-system: ${{ matrix.operatingSystem }} 
       browser: chrome 
+      browser-version: '127' 
     secrets: inherit 
 
     strategy: 
