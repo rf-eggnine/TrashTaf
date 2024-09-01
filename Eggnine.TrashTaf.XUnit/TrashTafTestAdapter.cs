@@ -102,9 +102,6 @@ namespace Eggnine.TrashTaf.XUnit
                     switch (ctx.BrowserName)
                     {
                         case "chrome":
-                            var chromeService = ChromeDriverService.CreateDefaultService();
-                            chromeService.LogPath = "chromelog.txt";
-                            chromeService.EnableVerboseLogging = true;
                             var chromeOptions = new ChromeOptions();
                             if (ctx.IsHeadless)
                             {
@@ -114,7 +111,7 @@ namespace Eggnine.TrashTaf.XUnit
                             {
                                 chromeOptions.BrowserVersion = ctx.BrowserMajorVersion;
                             }
-                            webDriverFunc = () => new ChromeDriver(chromeService, chromeOptions);
+                            webDriverFunc = () => new ChromeDriver(chromeOptions);
                             break;
                         case "firefox":
                             var firefoxOptions = new FirefoxOptions();
