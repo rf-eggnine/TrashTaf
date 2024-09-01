@@ -1,12 +1,14 @@
-name: Eggnine.TrashTaf_branch 
+name: Eggnine.TrashTaf
 
 on: 
   workflow_call: 
     inputs: 
       operating-system: 
+        description: The name and version of the operating system to run on 
         required: true 
         type: string 
       browser: 
+        description: The name of the browser to run TrashTaf with
         required: true 
         type: string 
     secrets: 
@@ -48,25 +50,29 @@ jobs:
 #end building TrashTaf 
 
 #start setting up postgres 
-    - name: Install PostgreSQL 16 for MacOs
+    - name: Install PostgreSQL 16 for MacOs (preinstalled for Ubuntu and Windows) 
       if: ('$RUNNER_OS' == 'macOS') 
-      shell: bash
-      run: |
-        export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
-        export HOMEBREW_NO_INSTALL_CLEANUP=1
-        export HOMEBREW_NO_INSTALL_UPGRADE=1
-        brew install --skip-post-install postgresql@16
+      shell: bash 
+      run: | 
+        export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 
+        export HOMEBREW_NO_INSTALL_CLEANUP=1 
+        export HOMEBREW_NO_INSTALL_UPGRADE=1 
+        brew install --skip-post-install postgresql@16 
         
-    - name: Add PostgreSQL binaries to PATH and Start preinstalled PostgreSQL for Windows and Linux
+    - name: Add PostgreSQL binaries to PATH 
       shell: bash 
       run: | 
         if [ "$RUNNER_OS" == "Windows" ]; then 
           echo "$PGBIN" >> $GITHUB_PATH 
         elif [ "$RUNNER_OS" == "Linux" ]; then 
           echo "$(pg_config --bindir)" >> $GITHUB_PATH 
-        elif [ "$RUNNER_OS" == "macOS" ]; then
-          brew link --overwrite postgresql@16
+        elif [ "$RUNNER_OS" == "macOS" ]; then 
+          brew link --overwrite postgresql@16 
         fi 
+        
+    - name: Start PostgreSQL 
+      shell: bash
+      run: |
         echo "Initializing database cluster..." 
         # Convert backslashes to forward slashes in RUNNER_TEMP for Windows Git Bash 
         export PGHOST="${RUNNER_TEMP//\\//}/postgres" 
