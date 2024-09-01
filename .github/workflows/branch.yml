@@ -10,5 +10,5 @@ jobs:
     with: 
       operating-system: ubuntu-latest
       browser: chrome 
-      browser-version: 127 
+      browser-version: '127' 
     secrets: inherit 
