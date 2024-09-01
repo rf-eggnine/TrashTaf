@@ -8,7 +8,7 @@ on:
     
 jobs: 
   main: 
-    uses: rf-eggnine/TrashTaf/.github/workflows/reuse-build-and-test.yml@28-integrates-with-postgresql-for-recording-test-results 
+    uses: rf-eggnine/TrashTaf/.github/workflows/reuse-build-and-test.yml@main 
     with: 
       operating-system: ${{ matrix.operatingSystem }} 
       browser: firefox 
