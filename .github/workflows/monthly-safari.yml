@@ -10,6 +10,7 @@ jobs:
     with: 
       operating-system: ${{ matrix.operatingSystem }} 
       browser: safari 
+      is-headless: false 
     secrets: inherit 
 
     strategy: 
