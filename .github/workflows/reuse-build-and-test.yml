@@ -11,6 +11,16 @@ on:
         description: The name of the browser to run TrashTaf with
         required: true 
         type: string 
+      browser-version: 
+        description: The exact version of the browser to use or "latest" 
+        required: false 
+        type: string 
+        default: latest 
+      is-headless:
+        description: Whether to run the browser as headless mode 
+        required: false 
+        type: boolean 
+        default: true 
     secrets: 
       POSTGRES_PASSWORD: 
         required: true 
@@ -118,9 +128,9 @@ jobs:
         content: > 
           { 
           "browserName": "${{ inputs.browser }}", 
-          "browserMajorVersion": "latest", 
+          "browserMajorVersion": "${{ inputs.browser-version }}", 
           "operatingSystemNameAndMajorVersion": "${{ inputs.operating-system }}", 
-          "isHeadless": true, 
+          "isHeadless": ${{ inputs.is-headless }}, 
           "gitHubUsername": "${{ secrets.MY_GITHUB_USERNAME }}", 
           "gitHubPassword": "${{ secrets.MY_GITHUB_PASSWORD }}", 
           "databaseConnectionString": "host=localhost;database=trash_db;username=trash_owner;password=${{ secrets.POSTGRES_PASSWORD }};" 

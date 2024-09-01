@@ -110,6 +110,10 @@ namespace Eggnine.TrashTaf.XUnit
                             {
                                 chromeOptions.AddArgument("--headless=new");
                             }
+                            if (!ctx.BrowserMajorVersion.Equals("latest", StringComparison.OrdinalIgnoreCase))
+                            {
+                                chromeOptions.BrowserVersion = ctx.BrowserMajorVersion;
+                            }
                             webDriverFunc = () => new ChromeDriver(chromeService, chromeOptions);
                             break;
                         case "firefox":
@@ -117,6 +121,10 @@ namespace Eggnine.TrashTaf.XUnit
                             if (ctx.IsHeadless)
                             {
                                 firefoxOptions.AddArgument("--headless");
+                            }
+                            if (!ctx.BrowserMajorVersion.Equals("latest", StringComparison.OrdinalIgnoreCase))
+                            {
+                                firefoxOptions.BrowserVersion = ctx.BrowserMajorVersion;
                             }
                             webDriverFunc = () => new FirefoxDriver();
                             break;
@@ -130,6 +138,10 @@ namespace Eggnine.TrashTaf.XUnit
                             {
                                 edgeOptions.AddArgument("--headless=new");
                             }
+                            if (!ctx.BrowserMajorVersion.Equals("latest", StringComparison.OrdinalIgnoreCase))
+                            {
+                                edgeOptions.BrowserVersion = ctx.BrowserMajorVersion;
+                            }
                             webDriverFunc = () => new EdgeDriver(edgeOptions);
                             break;
                         case "safari":
@@ -141,6 +153,11 @@ namespace Eggnine.TrashTaf.XUnit
                             {
                                 throw new Exception("Safari doesn't support headless mode");
                             }
+                            var safariOptions = new SafariOptions();
+                            if (!ctx.BrowserMajorVersion.Equals("latest", StringComparison.OrdinalIgnoreCase))
+                            {
+                                safariOptions.BrowserVersion = ctx.BrowserMajorVersion;
+                            }
                             webDriverFunc = () => new SafariDriver();
                             break;
                         case "android":
@@ -149,6 +166,10 @@ namespace Eggnine.TrashTaf.XUnit
                             {
                                 androidOptions.AddAdditionalAppiumOption("isHeadless", true);
                             }
+                            if (!ctx.BrowserMajorVersion.Equals("latest", StringComparison.OrdinalIgnoreCase))
+                            {
+                                androidOptions.BrowserVersion = ctx.BrowserMajorVersion;
+                            }
                             webDriverFunc = () => new AndroidDriver(androidOptions);
                             break;
                         case "ios":
@@ -156,6 +177,10 @@ namespace Eggnine.TrashTaf.XUnit
                             if (ctx.IsHeadless)
                             {
                                 iosOptions.AddAdditionalAppiumOption("isHeadless", true);
+                            }
+                            if (!ctx.BrowserMajorVersion.Equals("latest", StringComparison.OrdinalIgnoreCase))
+                            {
+                                iosOptions.BrowserVersion = ctx.BrowserMajorVersion;
                             }
                             webDriverFunc = () => new IOSDriver(iosOptions);
                             break;
@@ -300,7 +325,7 @@ namespace Eggnine.TrashTaf.XUnit
                 {
                     ctx.LogMessage($"WebDriver start failed on attempt {i}");
                     ctx.LogMessage($"Exception {e.GetType().FullName} with message {e.Message}");
-                    if (i > 4)
+                    if (i > 1)
                         throw;
                     i++;
                 }

@@ -6,8 +6,9 @@ on:
 
 jobs: 
   branch: 
-    uses: rf-eggnine/TrashTaf/.github/workflows/reuse-build-and-test.yml@main 
+    uses: rf-eggnine/TrashTaf/.github/workflows/reuse-build-and-test.yml@33-safari-wont-run-in-headless-mode 
     with: 
       operating-system: ubuntu-latest
-      browser: chrome  
+      browser: chrome 
+      browser-version: '127' 
     secrets: inherit 
