@@ -51,14 +51,16 @@ jobs:
 
 #start setting up postgres 
     - name: Install PostgreSQL 16 for MacOs (preinstalled for Ubuntu and Windows) 
-      if: ('$RUNNER_OS' == 'macos') 
       shell: bash 
       run: | 
-        export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 
-        export HOMEBREW_NO_INSTALL_CLEANUP=1 
-        export HOMEBREW_NO_INSTALL_UPGRADE=1 
-        brew install --skip-post-install postgresql@16 
-        brew link --overwrite postgresql@16 
+        echo "$RUNNER_OS" 
+        if [ "$RUNNER_OS" == "macos" ]  
+          export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 
+          export HOMEBREW_NO_INSTALL_CLEANUP=1 
+          export HOMEBREW_NO_INSTALL_UPGRADE=1 
+          brew install --skip-post-install postgresql@16 
+          brew link --overwrite postgresql@16 
+        fi 
         
     - name: Add PostgreSQL binaries to PATH
       shell: bash 
@@ -97,9 +99,11 @@ jobs:
         psql --host "$PGHOST" --username="$PGUSERNAME" --dbname="$PGDATABASE" < init.sql 
 #end setting up postgress 
 
-    - name: Start Xvfb for Firefox on Ubuntu
-      if: ('${{ inputs.browser }}' == 'firefox' && '$RUNNER_OS' == 'Linux')
-      run: Xvfb :99 & 
+    - name: Start Xvfb for Firefox on Ubuntu 
+      run: | 
+        if [ "${{ inputs.browser }}" == "firefox" && "$RUNNER_OS" == "Linux" ] 
+          Xvfb :99 & 
+        fi 
 
 #start write the appSettings.json 
     - uses: 1arp/create-a-file-action@0.4.5 
