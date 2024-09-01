@@ -256,6 +256,7 @@ namespace Eggnine.TrashTaf.XUnit
                 command.Parameters.Add(CreateParameter(command, "browserName", ctx.BrowserName));
                 command.Parameters.Add(CreateParameter(command, "browserVersion", ctx.BrowserMajorVersion));
                 command.Parameters.Add(CreateParameter(command, "logMessages", ctx.GetLogMessages()));
+                ctx.LogMessage("Writing to test result database");
                 Assert.Equal(1, command.ExecuteNonQuery());
             }
             catch (Exception e)
@@ -295,9 +296,10 @@ namespace Eggnine.TrashTaf.XUnit
                 {
                     return webDriverFunc();
                 }
-                catch (WebDriverException)
+                catch (WebDriverException e)
                 {
                     ctx.LogMessage($"WebDriver start failed on attempt {i}");
+                    ctx.LogMessage($"Exception {e.GetType().FullName} with message {e.Message}");
                     if (i > 4)
                         throw;
                     i++;
