@@ -53,8 +53,8 @@ jobs:
     - name: Install PostgreSQL 16 for MacOs (preinstalled for Ubuntu and Windows) 
       shell: bash 
       run: | 
-        echo "$RUNNER_OS" 
-        if [ "$RUNNER_OS" == "macos" ]; then 
+        if [[ "$RUNNER_OS" == "macOS" ]] 
+        then 
           export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 
           export HOMEBREW_NO_INSTALL_CLEANUP=1 
           export HOMEBREW_NO_INSTALL_UPGRADE=1 
@@ -65,11 +65,14 @@ jobs:
     - name: Add PostgreSQL binaries to PATH
       shell: bash 
       run: | 
-        if [ "$RUNNER_OS" == "Windows" ]; then 
+        if [[ "$RUNNER_OS" == "Windows" ]]
+        then 
           echo "$PGBIN" >> $GITHUB_PATH 
-        elif [ "$RUNNER_OS" == "Linux" ]; then 
+        elif [[ "$RUNNER_OS" == "Linux" ]]
+        then 
           echo "$(pg_config --bindir)" >> $GITHUB_PATH 
-        elif [ "$RUNNER_OS" == "macOS" ]; then 
+        elif [[ "$RUNNER_OS" == "macOS" ]]
+        then 
           echo "$(pg_config --bindir)" >> $GITHUB_PATH 
         fi 
         
@@ -101,7 +104,8 @@ jobs:
 
     - name: Start Xvfb for Firefox on Ubuntu 
       run: | 
-        if [ "${{ inputs.browser }}" == "firefox" && "$RUNNER_OS" == "Linux" ]; then 
+        if [[ "${{ inputs.browser }}" == "firefox" && "$RUNNER_OS" == "Linux" ]]
+        then 
           Xvfb :99 & 
         fi 
 
