@@ -1,8 +1,8 @@
 ﻿// TrashTaf © 2024 by RF@EggNine.com All Rights Reserved
 using Eggnine.TrashTaf.XUnit.SkipAttributes;
-using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Npgsql;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Android;
@@ -230,12 +230,8 @@ namespace Eggnine.TrashTaf.XUnit
 
         private void RecordTestSuccess(TrashContext ctx)
         {
-            ctx.LogMessage(ctx.DatabaseConnectionString);
-            DbCommand command = SqlClientFactory.Instance.CreateCommand();
-            command.Connection = new SqlConnection()
-            {
-                ConnectionString = "postgres://trash_owner:badpassword@localhost:5432/trash_db",
-            };
+            NpgsqlCommand command = new();
+            command.Connection = new NpgsqlConnection(ctx.DatabaseConnectionString);
             command.CommandText = "INSERT INTO testRuns (testName, className, runDateTime, durationMs, result, exceptionType, exceptionMessage, operatingSystemName, operatingSystemVersion, browserName, browserVersion, logMessages)" +
                                               " VALUES (@testName, @className, @runDateTime, @durationMs, @result, @exceptionType, @exceptionMessage, @operatingSystemName, @operatingSystemVersion, @browserName, @browserVersion, @logMessages)";
             command.Parameters.Add(CreateParameter(command, "testName", ctx.TestName));
@@ -253,7 +249,7 @@ namespace Eggnine.TrashTaf.XUnit
             Assert.Equal(1, command.ExecuteNonQuery());
         }
 
-        private DbParameter CreateParameter(DbCommand command, string name, object value)
+        private DbParameter CreateParameter(NpgsqlCommand command, string name, object value)
         {
             DbParameter parameter = command.CreateParameter();
             parameter.ParameterName = name;
