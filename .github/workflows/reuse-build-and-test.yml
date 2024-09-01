@@ -1,0 +1,133 @@
+name: Eggnine.TrashTaf
+
+on: 
+  workflow_call: 
+    inputs: 
+      operating-system: 
+        description: The name and version of the operating system to run on 
+        required: true 
+        type: string 
+      browser: 
+        description: The name of the browser to run TrashTaf with
+        required: true 
+        type: string 
+    secrets: 
+      POSTGRES_PASSWORD: 
+        required: true 
+      MY_GITHUB_USERNAME: 
+        required: true 
+      MY_GITHUB_PASSWORD: 
+        required: true 
+
+env: 
+    #for firefox on ubuntu 
+    DISPLAY: :99 
+    #for postgres 
+    PGHOST: localhost 
+    PGDATABASE: trash_db 
+    PGUSERNAME: trash_owner 
+    PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }} 
+
+jobs: 
+  build-and-test-trashtaf: 
+        
+    runs-on: ${{ format('{0}', inputs.operating-system) }} 
+
+    steps: 
+#start building TrashTaf 
+    - uses: actions/checkout@v4 
+  
+    - name: Setup .NET 
+      uses: actions/setup-dotnet@v4 
+      with: 
+        dotnet-version: 8.0.x 
+
+    - name: Restore dependencies 
+      run: dotnet restore 
+
+    - name: Build 
+      run: dotnet build --no-restore 
+#end building TrashTaf 
+
+#start setting up postgres 
+    - name: Install PostgreSQL 16 for MacOs (preinstalled for Ubuntu and Windows) 
+      shell: bash 
+      run: | 
+        if [[ "$RUNNER_OS" == "macOS" ]] 
+        then 
+          export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 
+          export HOMEBREW_NO_INSTALL_CLEANUP=1 
+          export HOMEBREW_NO_INSTALL_UPGRADE=1 
+          brew install --skip-post-install postgresql@16 
+          brew link --overwrite postgresql@16 
+        fi 
+        
+    - name: Add PostgreSQL binaries to PATH
+      shell: bash 
+      run: | 
+        if [[ "$RUNNER_OS" == "Windows" ]]
+        then 
+          echo "$PGBIN" >> $GITHUB_PATH 
+        elif [[ "$RUNNER_OS" == "Linux" ]]
+        then 
+          echo "$(pg_config --bindir)" >> $GITHUB_PATH 
+        elif [[ "$RUNNER_OS" == "macOS" ]]
+        then 
+          echo "$(pg_config --bindir)" >> $GITHUB_PATH 
+        fi 
+        
+    - name: Start PostgreSQL 
+      shell: bash
+      run: |
+        echo "Initializing database cluster..." 
+        # Convert backslashes to forward slashes in RUNNER_TEMP for Windows Git Bash 
+        export PGHOST="${RUNNER_TEMP//\\//}/postgres" 
+        export PGDATA="$PGHOST/pgdata" 
+        mkdir -p "$PGDATA" 
+
+        # initdb requires file for password in non-interactive mode 
+        export PWFILE="$RUNNER_TEMP/pwfile" 
+        echo "postgres" > $PWFILE 
+        initdb --pgdata="$PGDATA" --username="postgres" --pwfile="$PWFILE" 
+
+        echo "Starting PostgreSQL..." 
+        echo "unix_socket_directories = '$PGHOST'" >> "$PGDATA/postgresql.conf" 
+        pg_ctl start 
+
+        echo "Creating user..." 
+        psql --host "$PGHOST" --username="postgres" --dbname="postgres" --command="CREATE USER $PGUSERNAME PASSWORD '$PGPASSWORD'" --command="\du" 
+
+        echo "Creating database..." 
+        createdb --owner="$PGUSERNAME" --username="postgres" "$PGDATABASE" 
+        psql --host "$PGHOST" --username="$PGUSERNAME" --dbname="$PGDATABASE" < init.sql 
+#end setting up postgress 
+
+    - name: Start Xvfb for Firefox on Ubuntu 
+      shell: bash 
+      run: | 
+        if [[ "${{ inputs.browser }}" == "firefox" && "$RUNNER_OS" == "Linux" ]]
+        then 
+          Xvfb :99 & 
+        fi 
+
+#start write the appSettings.json 
+    - uses: 1arp/create-a-file-action@0.4.5 
+      with: 
+        path: Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/ 
+        file: appSettings.json 
+        content: > 
+          { 
+          "browserName": "${{ inputs.browser }}", 
+          "browserMajorVersion": "latest", 
+          "operatingSystemNameAndMajorVersion": "${{ inputs.operating-system }}", 
+          "isHeadless": true, 
+          "gitHubUsername": "${{ secrets.MY_GITHUB_USERNAME }}", 
+          "gitHubPassword": "${{ secrets.MY_GITHUB_PASSWORD }}", 
+          "databaseConnectionString": "host=localhost;database=trash_db;username=trash_owner;password=${{ secrets.POSTGRES_PASSWORD }};" 
+          } 
+#end write the appSettings.json 
+
+#start test TrashTaf 
+    - name: TrashTaf Test ${{ inputs.browser }} on ${{ inputs.operating-system }} 
+      run: dotnet test --no-build --verbosity normal 
+#end run TrashTaf 
