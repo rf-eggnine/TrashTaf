@@ -33,8 +33,17 @@ namespace Eggnine.TrashTaf.XUnit
         public void LogMessage(string message)
         {
             Console.WriteLine(message);
-            (WebDriver as IJavaScriptExecutor)?.ExecuteScript($"console.log('{message}');");
             LogMessages.AppendLine(message);
+            try
+            {
+                (WebDriver as IJavaScriptExecutor)?.ExecuteScript($"console.log('{message}');");
+            }
+            catch (Exception e)
+            {
+                string message2 = $"Error logging to web driver console {e.GetType().FullName} with message {e.Message}";
+                Console.WriteLine(message2);
+                LogMessages.AppendLine(message2);
+            }
         }
 
         internal object GetLogMessages()
