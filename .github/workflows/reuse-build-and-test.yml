@@ -51,7 +51,7 @@ jobs:
 
 #start setting up postgres 
     - name: Install PostgreSQL 16 for MacOs (preinstalled for Ubuntu and Windows) 
-      if: ('$RUNNER_OS' == 'MacOS') 
+      if: ('$RUNNER_OS' == 'macos') 
       shell: bash 
       run: | 
         export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 
