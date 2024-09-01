@@ -17,4 +17,4 @@ jobs:
     strategy: 
       fail-fast: false 
       matrix: 
-        operatingSystem: [ ubuntu-22.04, windows-2022, macos-13] 
+        operatingSystem: [ ubuntu-latest, windows-latest, macos-latest] 
