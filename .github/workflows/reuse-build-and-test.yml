@@ -98,7 +98,7 @@ jobs:
           { 
           "browserName": "${{ inputs.browser }}", 
           "browserMajorVersion": "latest", 
-          "operatingSystemNameAndMajorVersion": "${{ inputs.operatingSystem }}", 
+          "operatingSystemNameAndMajorVersion": "${{ inputs.operating-system }}", 
           "isHeadless": true, 
           "gitHubUsername": "${{ secrets.MY_GITHUB_USERNAME }}", 
           "gitHubPassword": "${{ secrets.MY_GITHUB_PASSWORD }}", 
