@@ -232,6 +232,7 @@ namespace Eggnine.TrashTaf.XUnit
         {
             NpgsqlCommand command = new();
             command.Connection = new NpgsqlConnection(ctx.DatabaseConnectionString);
+            command.Connection.Open();
             command.CommandText = "INSERT INTO testRuns (testName, className, runDateTime, durationMs, result, exceptionType, exceptionMessage, operatingSystemName, operatingSystemVersion, browserName, browserVersion, logMessages)" +
                                               " VALUES (@testName, @className, @runDateTime, @durationMs, @result, @exceptionType, @exceptionMessage, @operatingSystemName, @operatingSystemVersion, @browserName, @browserVersion, @logMessages)";
             command.Parameters.Add(CreateParameter(command, "testName", ctx.TestName));
@@ -247,6 +248,7 @@ namespace Eggnine.TrashTaf.XUnit
             command.Parameters.Add(CreateParameter(command, "browserVersion", ctx.BrowserMajorVersion));
             command.Parameters.Add(CreateParameter(command, "logMessages", ctx.GetLogMessages()));
             Assert.Equal(1, command.ExecuteNonQuery());
+            command.Connection.Close();
         }
 
         private DbParameter CreateParameter(NpgsqlCommand command, string name, object value)
