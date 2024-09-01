@@ -1,6 +1,7 @@
 name: Eggnine.TrashTaf_montly_edge 
 
 on:
+  workflow_dispatch: 
   schedule:
   - cron: 0 18 1 */1 * 
   
