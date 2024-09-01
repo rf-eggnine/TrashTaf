@@ -6,7 +6,7 @@ on:
 
 jobs: 
   branch: 
-    uses: rf-eggnine/TrashTaf/.github/workflows/reuse-build-and-test.yml@33-safari-wont-run-in-headless-mode 
+    uses: rf-eggnine/TrashTaf/.github/workflows/reuse-build-and-test.yml@main 
     with: 
       operating-system: ubuntu-latest
       browser: chrome 
