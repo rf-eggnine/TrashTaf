@@ -234,7 +234,7 @@ namespace Eggnine.TrashTaf.XUnit
             DbCommand command = SqlClientFactory.Instance.CreateCommand();
             command.Connection = new SqlConnection()
             {
-                ConnectionString = "postgresql://username:password@localhost:5432/database_name",
+                ConnectionString = ctx.DatabaseConnectionString,
             };
             command.CommandText = "INSERT INTO testRuns (testName, className, runDateTime, durationMs, result, exceptionType, exceptionMessage, operatingSystemName, operatingSystemVersion, browserName, browserVersion, logMessages)" +
                                               " VALUES (@testName, @className, @runDateTime, @durationMs, @result, @exceptionType, @exceptionMessage, @operatingSystemName, @operatingSystemVersion, @browserName, @browserVersion, @logMessages)";
