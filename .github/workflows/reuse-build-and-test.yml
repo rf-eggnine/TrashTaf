@@ -48,18 +48,25 @@ jobs:
 #end building TrashTaf 
 
 #start setting up postgres 
-    - name: Add PostgreSQL binaries to PATH 
+    - name: Install PostgreSQL 16 for MacOs
+      if: ('$RUNNER_OS' == 'macOS') 
+      shell: bash
+      run: |
+        export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
+        export HOMEBREW_NO_INSTALL_CLEANUP=1
+        export HOMEBREW_NO_INSTALL_UPGRADE=1
+        brew install --skip-post-install postgresql@16
+        
+    - name: Add PostgreSQL binaries to PATH and Start preinstalled PostgreSQL for Windows and Linux
       shell: bash 
       run: | 
         if [ "$RUNNER_OS" == "Windows" ]; then 
           echo "$PGBIN" >> $GITHUB_PATH 
         elif [ "$RUNNER_OS" == "Linux" ]; then 
           echo "$(pg_config --bindir)" >> $GITHUB_PATH 
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          brew link --overwrite postgresql@16
         fi 
-
-    - name: Start preinstalled PostgreSQL 
-      shell: bash 
-      run: | 
         echo "Initializing database cluster..." 
         # Convert backslashes to forward slashes in RUNNER_TEMP for Windows Git Bash 
         export PGHOST="${RUNNER_TEMP//\\//}/postgres" 
@@ -83,11 +90,9 @@ jobs:
         psql --host "$PGHOST" --username="$PGUSERNAME" --dbname="$PGDATABASE" < init.sql 
 #end setting up postgress 
 
-#start add support for Firefox on ubuntu 
-    - name: Start Xvfb for Firefox
+    - name: Start Xvfb for Firefox on Ubuntu
       if: ('$RUNNER_OS' == 'Linux' && ''${{ inputs.browser }}' == 'firefox') 
       run: Xvfb :99 & 
-#end add support for Firefox on ubuntu 
 
 #start write the appSettings.json 
     - uses: 1arp/create-a-file-action@0.4.5 
