@@ -60,12 +60,14 @@ jobs:
         brew install --skip-post-install postgresql@16 
         brew link --overwrite postgresql@16 
         
-    - name: Add PostgreSQL binaries to PATH for Windows and Linux
+    - name: Add PostgreSQL binaries to PATH
       shell: bash 
       run: | 
         if [ "$RUNNER_OS" == "Windows" ]; then 
           echo "$PGBIN" >> $GITHUB_PATH 
         elif [ "$RUNNER_OS" == "Linux" ]; then 
+          echo "$(pg_config --bindir)" >> $GITHUB_PATH 
+        elif [ "$RUNNER_OS" == "macOS" ]; then 
           echo "$(pg_config --bindir)" >> $GITHUB_PATH 
         fi 
         
@@ -96,7 +98,7 @@ jobs:
 #end setting up postgress 
 
     - name: Start Xvfb for Firefox on Ubuntu
-      if: ('$RUNNER_OS' == 'Linux' && ''${{ inputs.browser }}' == 'firefox') 
+      if: ('$RUNNER_OS' == 'Linux' && '${{ inputs.browser }}' == 'firefox') 
       run: Xvfb :99 & 
 
 #start write the appSettings.json 
