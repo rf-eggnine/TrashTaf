@@ -57,6 +57,7 @@ namespace Eggnine.TrashTaf.XUnit
                             TrashContext.GitHubPassword = property.Value.ToString();
                             break;
                         case "databaseConnectionString":
+                            Assert.True(property.Value.ToString().StartsWith("postgresql://trash_owner:"));
                             TrashContext.DatabaseConnectionString = property.Value.ToString();
                             break;
                         default:
