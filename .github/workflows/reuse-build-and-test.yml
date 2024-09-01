@@ -10,11 +10,11 @@ on:
         required: true 
         type: string 
     secrets: 
-      POSTGRES-PASSWORD: 
+      POSTGRES_PASSWORD: 
         required: true 
-      MY-GITHUB-USERNAME: 
+      MY_GITHUB_USERNAME: 
         required: true 
-      MY-GITHUB-PASSWORD: 
+      MY_GITHUB_PASSWORD: 
         required: true 
 
 env: 
@@ -24,7 +24,7 @@ env:
     PGHOST: localhost 
     PGDATABASE: trash_db 
     PGUSERNAME: trash_owner 
-    PGPASSWORD: ${{ secrets.POSTGRES-PASSWORD }} 
+    PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }} 
 
 jobs: 
   build-and-test-trashtaf: 
@@ -100,9 +100,9 @@ jobs:
           "browserMajorVersion": "latest", 
           "operatingSystemNameAndMajorVersion": "${{ inputs.operatingSystem }}", 
           "isHeadless": true, 
-          "gitHubUsername": "${{ secrets.MY-GITHUB-USERNAME }}", 
-          "gitHubPassword": "${{ secrets.MY-GITHUB-PASSWORD }}", 
-          "databaseConnectionString": "host=localhost;database=trash_db;username=trash_owner;password=${{ secrets.POSTGRES-PASSWORD }};" 
+          "gitHubUsername": "${{ secrets.MY_GITHUB_USERNAME }}", 
+          "gitHubPassword": "${{ secrets.MY_GITHUB_PASSWORD }}", 
+          "databaseConnectionString": "host=localhost;database=trash_db;username=trash_owner;password=${{ secrets.POSTGRES_PASSWORD }};" 
           } 
 #end write the appSettings.json 
 
