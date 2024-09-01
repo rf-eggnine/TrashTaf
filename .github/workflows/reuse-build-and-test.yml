@@ -12,13 +12,10 @@ on:
     secrets: 
       POSTGRES-PASSWORD: 
         required: true 
-        type: string 
       MY-GITHUB-USERNAME: 
         required: true 
-        type: string 
       MY-GITHUB-PASSWORD: 
         required: true 
-        type: string 
 
 env: 
     #for firefox on ubuntu 
@@ -31,8 +28,6 @@ env:
 
 jobs: 
   build-and-test-trashtaf: 
-    strategy: 
-      fail-fast: false 
         
     runs-on: ${{ format('{0}', inputs.operating-system) }} 
 
