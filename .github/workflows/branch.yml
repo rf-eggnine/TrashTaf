@@ -9,5 +9,6 @@ jobs:
     uses: rf-eggnine/TrashTaf/.github/workflows/reuse-build-and-test.yml@main 
     with: 
       operating-system: ubuntu-latest
-      browser: chrome  
+      browser: chrome 
+      browser-version: 127 
     secrets: inherit 
