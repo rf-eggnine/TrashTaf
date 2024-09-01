@@ -7,13 +7,13 @@ on:
     branches: [ "main" ] 
 
 env: 
-    #for firefox on ubuntu
+    #for firefox on ubuntu 
     DISPLAY: :99 
-    #for postgres
-    PGHOST: localhost
-    PGDATABASE: trash_db
-    PGUSERNAME: $POSTGRES_USERNAME
-    PGPASSWORD: $POSTGRES_PASSWORD  
+    #for postgres 
+    PGHOST: localhost 
+    PGDATABASE: trash_db 
+    PGUSERNAME: trash_owner 
+    PGPASSWORD: $POSTGRES_PASSWORD 
 
 jobs: 
   tests: 
