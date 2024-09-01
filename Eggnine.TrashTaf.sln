@@ -17,9 +17,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\branch.yml = .github\workflows\branch.yml
 		.github\workflows\main.yml = .github\workflows\main.yml
-		.github\workflows\monthly-chrome-firefox.yml = .github\workflows\monthly-chrome-firefox.yml
-		.github\workflows\montly-edge.yml = .github\workflows\montly-edge.yml
-		.github\workflows\montly-safari.yml = .github\workflows\montly-safari.yml
+		.github\workflows\monthly-chrome.yml = .github\workflows\monthly-chrome.yml
+		.github\workflows\monthly-edge.yml = .github\workflows\monthly-edge.yml
+		.github\workflows\monthly-firefox.yml = .github\workflows\monthly-firefox.yml
+		.github\workflows\monthly-safari.yml = .github\workflows\monthly-safari.yml
 		.github\workflows\reuse-build-and-test.yml = .github\workflows\reuse-build-and-test.yml
 	EndProjectSection
 EndProject
