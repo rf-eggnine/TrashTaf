@@ -230,7 +230,7 @@ namespace Eggnine.TrashTaf.XUnit
 
         private void RecordTestSuccess(TrashContext ctx)
         {
-            ctx.LogMessage(cts.DatabaseConnectionString);
+            ctx.LogMessage(ctx.DatabaseConnectionString);
             DbCommand command = SqlClientFactory.Instance.CreateCommand();
             command.Connection = new SqlConnection()
             {
