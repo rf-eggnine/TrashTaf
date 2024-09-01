@@ -98,7 +98,7 @@ jobs:
 #end setting up postgress 
 
     - name: Start Xvfb for Firefox on Ubuntu
-      if: ('$RUNNER_OS' == 'Linux' && '${{ inputs.browser }}' == 'firefox') 
+      if: ('${{ inputs.browser }}' == 'firefox' && '$RUNNER_OS' == 'Linux')
       run: Xvfb :99 & 
 
 #start write the appSettings.json 
@@ -119,6 +119,6 @@ jobs:
 #end write the appSettings.json 
 
 #start test TrashTaf 
-    - name: TrashTaf Test ${{ inputs.browser }} on ${{ inputs.operatingSystem }} 
+    - name: TrashTaf Test ${{ inputs.browser }} on ${{ inputs.operating-system }} 
       run: dotnet test --no-build --verbosity normal 
 #end run TrashTaf 
