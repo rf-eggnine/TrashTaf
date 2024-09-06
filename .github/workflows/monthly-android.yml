@@ -1,0 +1,53 @@
+name: Eggnine.TrashTaf_monthly_android
+
+on:
+  workflow_dispatch: 
+  schedule:
+  - cron: 0 18 1 */1 * 
+
+env:
+  EMULATOR_NAME: nexus 
+  ANDRIOD_ARCH: x86_64 
+  ANDROID_TARGET: google_apis_playstore 
+  API_LEVEL: 33 
+  ANDROID_BUILD_TOOLS_VERSION: 33.0.2 
+  ANDROID_SDK_PACKAGES: system-images;android-33;google_apis_playstore;x86_64 platforms;android-33 build-tools;33.0.2 platform-tools emulator
+
+jobs: 
+  trashtaf-on-android: 
+    timeout-minutes: 10
+    runs-on: ubuntu-latest 
+    steps: 
+    - name: Add to path 
+      shell: bash 
+      run: echo "$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/${{ env.ANDROID_BUILD_TOOLS_VERSION }}" >> $GITHUB_PATH 
+
+    - name: Install SDK 
+      shell: bash 
+      run: | 
+        yes Y | sdkmanager --licenses 
+        sdkmanager --install $ANDROID_SDK_PACKAGES 
+        
+    - name: Build emulator 
+      shell: bash 
+      run: |
+        echo "no" | avdmanager --verbose create avd --force -n $EMULATOR_NAME --abi "${ANDROID_TARGET}/${ANDROID_ARCH}" -k "system-images;android-${API_LEVEL};${ANDROID_TARGET};${ANDROID_ARCH}" 
+
+    - name: Start emulator 
+      shell: bash 
+      run: | 
+        options="@${{ env.EMULATOR_NAME }} -no-window -no-snapshot -screen no-touch -noaudio -memory 2048 -no-boot-anim -accel on -camera-back none" 
+        nohup emulator $options -gpu off & 
+      
+    - name: Wait for emulator to start 
+      shell: bash 
+      run: | 
+        while true; do 
+          result=$(adb shell getprop sys.boot_completed 2>&1) 
+          if [ "$result" == "1" ]; then 
+            adb devices -l 
+            adb shell input keyevent 82 
+            break 
+          fi 
+          sleep 1 
+        done 
