@@ -1,4 +1,4 @@
-name: Eggnine.TrashTaf_main 
+name: Eggnine.TrashTas_main 
 
 on: 
   push: 
@@ -8,7 +8,7 @@ on:
     
 jobs: 
   main: 
-    uses: rf-eggnine/TrashTaf/.github/workflows/reuse-build-and-test.yml@main 
+    uses: rf-eggnine/TrashTas/.github/workflows/reuse-build-and-test.yml@main 
     with: 
       operating-system: ${{ matrix.operatingSystem }} 
       browser: firefox 

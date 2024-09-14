@@ -1,5 +1,5 @@
-// TrashTaf ©️ 2024 by RF@EggNine.com All Rights Reserved
-﻿namespace Eggnine.TrashTaf.XUnit.SkipAttributes
+//  ©️ 2024 by RF@EggNine.com All Rights Reserved
+﻿namespace Eggnine..XUnit.SkipAttributes
 {
     public class SkipIfBrowserIsNot : SkipIf
     {

@@ -1,4 +1,4 @@
-name: Eggnine.TrashTaf
+name: Eggnine.TrashTas
 
 on: 
   workflow_call: 
@@ -8,7 +8,7 @@ on:
         required: true 
         type: string 
       browser: 
-        description: The name of the browser to run TrashTaf with
+        description: The name of the browser to run TrashTas with
         required: true 
         type: string 
       browser-version: 
@@ -44,7 +44,7 @@ jobs:
     runs-on: ${{ format('{0}', inputs.operating-system) }} 
 
     steps: 
-#start building TrashTaf 
+#start building TrashTas 
     - uses: actions/checkout@v4 
   
     - name: Setup .NET 
@@ -57,7 +57,7 @@ jobs:
 
     - name: Build 
       run: dotnet build --no-restore 
-#end building TrashTaf 
+#end building TrashTas 
 
 #start setting up postgres 
     - name: Install PostgreSQL 16 for MacOs (preinstalled for Ubuntu and Windows) 
@@ -123,7 +123,7 @@ jobs:
 #start write the appSettings.json 
     - uses: 1arp/create-a-file-action@0.4.5 
       with: 
-        path: Eggnine.TrashTaf.XUnit/bin/Debug/net8.0/ 
+        path: Eggnine.TrashTas.XUnit/bin/Debug/net8.0/ 
         file: appSettings.json 
         content: > 
           { 
@@ -137,7 +137,7 @@ jobs:
           } 
 #end write the appSettings.json 
 
-#start test TrashTaf 
-    - name: TrashTaf Test ${{ inputs.browser }} on ${{ inputs.operating-system }} 
+#start test TrashTas 
+    - name: TrashTas Test ${{ inputs.browser }} on ${{ inputs.operating-system }} 
       run: dotnet test --no-build --verbosity normal 
-#end run TrashTaf 
+#end run TrashTas 

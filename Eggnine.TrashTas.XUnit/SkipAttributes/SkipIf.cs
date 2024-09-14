@@ -1,8 +1,8 @@
-// TrashTaf ©️ 2024 by RF@EggNine.com All Rights Reserved
+//  ©️ 2024 by RF@EggNine.com All Rights Reserved
 ﻿using OpenQA.Selenium.Internal;
 using System.Drawing;
 
-namespace Eggnine.TrashTaf.XUnit.SkipAttributes
+namespace Eggnine..XUnit.SkipAttributes
 {
     public abstract class SkipIf : Attribute
     {

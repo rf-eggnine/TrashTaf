@@ -1,10 +1,10 @@
-﻿// TrashTaf © 2024 by RF@EggNine.com All Rights Reserved
+﻿//  © 2024 by RF@EggNine.com All Rights Reserved
 
 using OpenQA.Selenium;
 using System.Reflection;
 using System.Text;
 
-namespace Eggnine.TrashTaf.XUnit
+namespace Eggnine..XUnit
 {
     public class TrashContext
     {

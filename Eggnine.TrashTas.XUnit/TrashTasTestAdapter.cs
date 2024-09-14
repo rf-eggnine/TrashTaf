@@ -1,5 +1,5 @@
-﻿// TrashTaf © 2024 by RF@EggNine.com All Rights Reserved
-using Eggnine.TrashTaf.XUnit.SkipAttributes;
+﻿//  © 2024 by RF@EggNine.com All Rights Reserved
+using Eggnine..XUnit.SkipAttributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Npgsql;
@@ -15,16 +15,16 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace Eggnine.TrashTaf.XUnit
+namespace Eggnine..XUnit
 {
-    public class TrashTafTestAdapter
+    public class TestAdapter
     {
         public TrashContext TrashContext;
         private Exception firstException;
         private Exception secondException;
         private Exception thirdException;
 
-        public TrashTafTestAdapter()
+        public TestAdapter()
         {
             TrashContext = new();
             using Stream stream = File.OpenRead("appSettings.json");
@@ -333,6 +333,6 @@ namespace Eggnine.TrashTaf.XUnit
         /// Convenience method for Tests to call
         /// </summary>
         /// <param name="test"></param>
-        public static void Execute(Action<TrashContext> test) => new TrashTafTestAdapter().ExecuteTest(test);
+        public static void Execute(Action<TrashContext> test) => new TestAdapter().ExecuteTest(test);
     }
 }

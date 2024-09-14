@@ -1,13 +1,13 @@
-// TrashTaf © 2024 by RF@EggNine.com All Rights Reserved
+//  © 2024 by RF@EggNine.com All Rights Reserved
 using OpenQA.Selenium;
 using System.Diagnostics;
 
-namespace Eggnine.TrashTaf.XUnit.Tests
+namespace Eggnine..XUnit.Tests
 {
     public class ExampleTests
     {
         [SkippableFact, TestCase(1), Priority(1)]
-        public void VerifyTestCaseOneIsFoundViaWebDriver() => TrashTafTestAdapter.Execute((ctx) =>
+        public void VerifyTestCaseOneIsFoundViaWebDriver() => TestAdapter.Execute((ctx) =>
         {
             // Arrange
             Assert.NotNull(ctx.WebDriver);
@@ -22,7 +22,7 @@ namespace Eggnine.TrashTaf.XUnit.Tests
             signInButton.Click();
             Task.Delay(1000).Wait();
             Debug.WriteLine((webDriver as IJavaScriptExecutor).ExecuteScript("return document.body.innerHTML"));
-            webDriver.Navigate().GoToUrl("https://github.com/rf-eggnine/TrashTaf/issues/1");
+            webDriver.Navigate().GoToUrl("https://github.com/rf-eggnine//issues/1");
             // Act
             var element = webDriver.FindElement(By.CssSelector("#partial-discussion-header .js-issue-title.markdown-title"));
             // Assert
