@@ -39,7 +39,7 @@ env:
     PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }} 
 
 jobs: 
-  build-and-test-trashtaf: 
+  build-and-test-trashtas: 
         
     runs-on: ${{ format('{0}', inputs.operating-system) }} 
 
