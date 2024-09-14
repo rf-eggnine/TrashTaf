@@ -22,7 +22,7 @@ namespace Eggnine.TrashTas.XUnit.Tests
             signInButton.Click();
             Task.Delay(1000).Wait();
             Debug.WriteLine((webDriver as IJavaScriptExecutor).ExecuteScript("return document.body.innerHTML"));
-            webDriver.Navigate().GoToUrl("https://github.com/rf-eggnine//issues/1");
+            webDriver.Navigate().GoToUrl("https://github.com/rf-eggnine/TrashTas/issues/1");
             // Act
             var element = webDriver.FindElement(By.CssSelector("#partial-discussion-header .js-issue-title.markdown-title"));
             // Assert
