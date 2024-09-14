@@ -1,4 +1,4 @@
-name: Eggnine.TrashTaf_monthly_android
+name: Eggnine.TrashTas_monthly_android
 
 on:
   workflow_dispatch: 
