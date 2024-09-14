@@ -2,7 +2,7 @@
 ﻿using OpenQA.Selenium.Internal;
 using System.Drawing;
 
-namespace Eggnine..XUnit.SkipAttributes
+namespace Eggnine.TrashTas.XUnit.SkipAttributes
 {
     public abstract class SkipIf : Attribute
     {

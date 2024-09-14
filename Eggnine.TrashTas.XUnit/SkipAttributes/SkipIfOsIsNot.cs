@@ -1,5 +1,5 @@
 //  ©️ 2024 by RF@EggNine.com All Rights Reserved
-﻿namespace Eggnine..XUnit.SkipAttributes
+﻿namespace Eggnine.TrashTas.XUnit.SkipAttributes
 {
     [AttributeUsage(AttributeTargets.Class|AttributeTargets.Method)]
     public class SkipIfOsIsNot : SkipIf
