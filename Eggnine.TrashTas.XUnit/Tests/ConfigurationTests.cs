@@ -1,8 +1,8 @@
 //  ©️ 2024 by RF@EggNine.com All Rights Reserved
-﻿using Eggnine..XUnit.SkipAttributes;
+﻿using Eggnine.TrashTas.XUnit.SkipAttributes;
 using System.Globalization;
 
-namespace Eggnine..XUnit.Tests
+namespace Eggnine.TrashTas.XUnit.Tests
 {
     public class ConfigurationTests
     {

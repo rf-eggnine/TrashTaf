@@ -2,7 +2,7 @@
 using OpenQA.Selenium;
 using System.Diagnostics;
 
-namespace Eggnine..XUnit.Tests
+namespace Eggnine.TrashTas.XUnit.Tests
 {
     public class ExampleTests
     {

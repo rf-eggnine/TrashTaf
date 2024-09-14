@@ -1,5 +1,5 @@
 ﻿//  © 2024 by RF@EggNine.com All Rights Reserved
-using Eggnine..XUnit.SkipAttributes;
+using Eggnine.TrashTas.XUnit.SkipAttributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Npgsql;
@@ -15,7 +15,7 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace Eggnine..XUnit
+namespace Eggnine.TrashTas.XUnit
 {
     public class TestAdapter
     {

@@ -1,5 +1,5 @@
 ﻿//  © 2024 by RF@EggNine.com All Rights Reserved
-namespace Eggnine..XUnit
+namespace Eggnine.TrashTas.XUnit
 {
     public class TestCase : Attribute
     {

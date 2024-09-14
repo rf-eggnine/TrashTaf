@@ -4,7 +4,7 @@ using OpenQA.Selenium;
 using System.Reflection;
 using System.Text;
 
-namespace Eggnine..XUnit
+namespace Eggnine.TrashTas.XUnit
 {
     public class TrashContext
     {
